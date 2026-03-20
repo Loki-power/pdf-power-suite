@@ -1,0 +1,330 @@
+﻿Γû▓ Next.js 16.1.6 (Turbopack)
+
+  Creating an optimized production build ...
+node.exe : Error: 
+Can't resolve 
+'tailwindcss-animate' 
+in 'C:\Users\dell\.gem
+ini\antigravity\scratc
+h\multi-tool-app\src\a
+pp'
+At line:1 char:1
++ & "C:\Program Files\
+nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo 
+...
++ ~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
+~~~~~
+    + CategoryInfo    
+          : NotSpeci  
+  fied: (Error: Can   
+ 't re...ol-app\sr    
+c\app':String) []    
+, RemoteException
+    + FullyQualifiedE 
+   rrorId : NativeCo  
+  mmandError
+ 
+    [2m[at 
+finishWithoutResolve (
+C:\Users\dell\.gemini\
+antigravity\scratch\mu
+lti-tool-app\node_modu
+les\enhanced-resolve\l
+ib\Resolver.js:586:18)
+][0m
+    [2m[at C:\Users\d
+ell\.gemini\antigravit
+y\scratch\multi-tool-a
+pp\node_modules\enhanc
+ed-resolve\lib\Resolve
+r.js:678:14][0m
+    [2m[at C:\Users\d
+ell\.gemini\antigravit
+y\scratch\multi-tool-a
+pp\node_modules\enhanc
+ed-resolve\lib\Resolve
+r.js:739:5][0m
+    [2m[at eval 
+(eval at create (C:\Us
+ers\dell\.gemini\antig
+ravity\scratch\multi-t
+ool-app\node_modules\t
+apable\lib\HookCodeFac
+tory.js:31:10), 
+<anonymous>:15:1)][0m
+    [2m[at C:\Users\d
+ell\.gemini\antigravit
+y\scratch\multi-tool-a
+pp\node_modules\enhanc
+ed-resolve\lib\Resolve
+r.js:739:5][0m
+    [2m[at eval 
+(eval at create (C:\Us
+ers\dell\.gemini\antig
+ravity\scratch\multi-t
+ool-app\node_modules\t
+apable\lib\HookCodeFac
+tory.js:31:10), 
+<anonymous>:27:1)][0m
+    [2m[at C:\Users\d
+ell\.gemini\antigravit
+y\scratch\multi-tool-a
+pp\node_modules\enhanc
+ed-resolve\lib\Descrip
+tionFilePlugin.js:89:4
+3][0m
+    [2m[at C:\Users\d
+ell\.gemini\antigravit
+y\scratch\multi-tool-a
+pp\node_modules\enhanc
+ed-resolve\lib\Resolve
+r.js:739:5][0m
+    [2m[at eval 
+(eval at create (C:\Us
+ers\dell\.gemini\antig
+ravity\scratch\multi-t
+ool-app\node_modules\t
+apable\lib\HookCodeFac
+tory.js:31:10), 
+<anonymous>:15:1)][0m
+    [2m[at C:\Users\d
+ell\.gemini\antigravit
+y\scratch\multi-tool-a
+pp\node_modules\enhanc
+ed-resolve\lib\Resolve
+r.js:739:5][0m {
+  details: "resolve 
+'tailwindcss-animate' 
+in 'C:\\Users\\dell\\.
+gemini\\antigravity\\s
+cratch\\multi-tool-app
+\\src\\app'\n" +
+    '  Parsed request 
+is a module\n' +
+    '  using 
+description file: C:\\
+Users\\dell\\.gemini\\
+antigravity\\scratch\\
+multi-tool-app\\packag
+e.json (relative 
+path: ./src/app)\n' +
+    '    resolve as 
+module\n' +
+    "      C:\\Users\\
+dell\\.gemini\\antigra
+vity\\scratch\\multi-t
+ool-app\\src\\app\\nod
+e_modules doesn't 
+exist or is not a 
+directory\n" +
+    "      C:\\Users\\
+dell\\.gemini\\antigra
+vity\\scratch\\multi-t
+ool-app\\src\\node_mod
+ules doesn't exist or 
+is not a directory\n" 
++
+    '      looking 
+for modules in C:\\Use
+rs\\dell\\.gemini\\ant
+igravity\\scratch\\mul
+ti-tool-app\\node_modu
+les\n' +
+    '        single 
+file module\n' +
+    '          using 
+description file: C:\\
+Users\\dell\\.gemini\\
+antigravity\\scratch\\
+multi-tool-app\\packag
+e.json (relative 
+path: ./node_modules/t
+ailwindcss-animate)\n'
+ +
+    '            no 
+extension\n' +
+    "              C:\
+\Users\\dell\\.gemini\
+\antigravity\\scratch\
+\multi-tool-app\\node_
+modules\\tailwindcss-a
+nimate doesn't 
+exist\n" +
+    '            
+.js\n' +
+    "              C:\
+\Users\\dell\\.gemini\
+\antigravity\\scratch\
+\multi-tool-app\\node_
+modules\\tailwindcss-a
+nimate.js doesn't 
+exist\n" +
+    '            
+.json\n' +
+    "              C:\
+\Users\\dell\\.gemini\
+\antigravity\\scratch\
+\multi-tool-app\\node_
+modules\\tailwindcss-a
+nimate.json doesn't 
+exist\n" +
+    '            
+.node\n' +
+    "              C:\
+\Users\\dell\\.gemini\
+\antigravity\\scratch\
+\multi-tool-app\\node_
+modules\\tailwindcss-a
+nimate.node doesn't 
+exist\n" +
+    '            
+.ts\n' +
+    "              C:\
+\Users\\dell\\.gemini\
+\antigravity\\scratch\
+\multi-tool-app\\node_
+modules\\tailwindcss-a
+nimate.ts doesn't 
+exist\n" +
+    "        C:\\Users
+\\dell\\.gemini\\antig
+ravity\\scratch\\multi
+-tool-app\\node_module
+s\\tailwindcss-animate
+ doesn't exist\n" +
+    "      C:\\Users\\
+dell\\.gemini\\antigra
+vity\\scratch\\node_mo
+dules doesn't exist 
+or is not a 
+directory\n" +
+    "      C:\\Users\\
+dell\\.gemini\\antigra
+vity\\node_modules 
+doesn't exist or is 
+not a directory\n" +
+    "      C:\\Users\\
+dell\\.gemini\\node_mo
+dules doesn't exist 
+or is not a 
+directory\n" +
+    "      C:\\Users\\
+dell\\node_modules 
+doesn't exist or is 
+not a directory\n" +
+    "      C:\\Users\\
+node_modules doesn't 
+exist or is not a 
+directory\n" +
+    "      
+C:\\node_modules 
+doesn't exist or is 
+not a directory"
+}
+
+> Build error occurred
+Error: Turbopack 
+build failed with 1 
+errors:
+./src/app/globals.css
+Error evaluating 
+Node.js code
+CssSyntaxError: 
+tailwindcss: C:\Users\
+dell\.gemini\antigravi
+ty\scratch\multi-tool-
+app\src\app\globals.cs
+s:1:1: Can't resolve 
+'tailwindcss-animate' 
+in 'C:\Users\dell\.gem
+ini\antigravity\scratc
+h\multi-tool-app\src\a
+pp'
+    at Input.error (no
+de_modules/postcss/lib
+/input.js:135:16) [C:\
+Users\dell\.gemini\ant
+igravity\scratch\multi
+-tool-app\.next\build\
+chunks\node_modules_fe
+693df6._.js:4651:22]
+    at Root.error (nod
+e_modules/postcss/lib/
+node.js:146:32) [C:\Us
+ers\dell\.gemini\antig
+ravity\scratch\multi-t
+ool-app\.next\build\ch
+unks\node_modules_fe69
+3df6._.js:928:38]
+    [at Object.Once (C
+:\Users\dell\.gemini\a
+ntigravity\scratch\mul
+ti-tool-app\node_modul
+es\@tailwindcss\postcs
+s\dist\index.js:10:691
+3)]
+    at async 
+LazyResult.runAsync (n
+ode_modules/postcss/li
+b/lazy-result.js:293:1
+1) [C:\Users\dell\.gem
+ini\antigravity\scratc
+h\multi-tool-app\.next
+\build\chunks\node_mod
+ules_fe693df6._.js:621
+4:21]
+    at async 
+transform (turbopack:/
+//[turbopack-node]/tra
+nsforms/postcss.ts:70:
+34) [C:\Users\dell\.ge
+mini\antigravity\scrat
+ch\multi-tool-app\.nex
+t\build\chunks\[root-o
+f-the-server]__51225da
+f._.js:146:36]
+    at async run (turb
+opack:///[turbopack-no
+de]/ipc/evaluate.ts:92
+:23) [C:\Users\dell\.g
+emini\antigravity\scra
+tch\multi-tool-app\.ne
+xt\build\chunks\[root-
+of-the-server]__974941
+ed._.js:443:31]
+
+Import trace:
+  Client Component 
+Browser:
+    
+./src/app/globals.css 
+[Client Component 
+Browser]
+    
+./src/app/layout.tsx 
+[Server Component]
+
+
+    at async 
+transform (turbopack:/
+//[turbopack-node]/tra
+nsforms/postcss.ts:70:
+34) [C:\Users\dell\.ge
+mini\antigravity\scrat
+ch\multi-tool-app\.nex
+t\build\chunks\[root-o
+f-the-server]__51225da
+f._.js:146:36])
+    at async run (turb
+opack:///[turbopack-no
+de]/ipc/evaluate.ts:92
+:23) [C:\Users\dell\.g
+emini\antigravity\scra
+tch\multi-tool-app\.ne
+xt\build\chunks\[root-
+of-the-server]__974941
+ed._.js:443:31])

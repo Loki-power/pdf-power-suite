@@ -1,0 +1,72 @@
+﻿Γû▓ Next.js 16.1.6 (Turbopack)
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 6.1s
+  Running TypeScript ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/9) ...
+node.exe : Warning: 
+Please use the `legacy` 
+build in Node.js 
+environments.
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (W  
+  arning: Please...s en   
+ vironments.:String) [    
+], RemoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+Error occurred 
+prerendering page 
+"/pdf/organize". Read 
+more: https://nextjs.org/d
+ocs/messages/prerender-err
+or
+ReferenceError: DOMMatrix 
+is not defined
+    at module evaluation (
+C:\Users\dell\.gemini\anti
+gravity\scratch\multi-tool
+-app\.next\server\chunks\s
+sr\src_app_pdf_organize_pa
+ge_tsx_e2cfabe7._.js:2:131
+059)
+    at instantiateModule (
+C:\Users\dell\.gemini\anti
+gravity\scratch\multi-tool
+-app\.next\server\chunks\s
+sr\[turbopack]_runtime.js:
+740:9)
+    at getOrInstantiateMod
+uleFromParent (C:\Users\de
+ll\.gemini\antigravity\scr
+atch\multi-tool-app\.next\
+server\chunks\ssr\[turbopa
+ck]_runtime.js:763:12)
+    at 
+Context.commonJsRequire 
+[as r] (C:\Users\dell\.gem
+ini\antigravity\scratch\mu
+lti-tool-app\.next\server\
+chunks\ssr\[turbopack]_run
+time.js:249:12) {
+  digest: '3842538149'
+}
+Export encountered an 
+error on 
+/pdf/organize/page: 
+/pdf/organize, exiting 
+the build.
+Γ¿» Next.js build worker 
+exited with code: 1 and 
+signal: null
