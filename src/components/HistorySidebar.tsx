@@ -22,6 +22,8 @@ export function HistorySidebar() {
       case "finishing": return <SparklesIcon className="h-4 w-4 text-fuchsia-500" />;
       case "intelligence": return <SearchIcon className="h-4 w-4 text-emerald-500" />;
       case "organize": return <FileTextIcon className="h-4 w-4 text-orange-500" />;
+      case "convert": return <FileTextIcon className="h-4 w-4 text-cyan-500" />;
+      case "image": return <FileTextIcon className="h-4 w-4 text-lime-500" />;
       default: return <FileTextIcon className="h-4 w-4 text-muted-foreground" />;
     }
   };

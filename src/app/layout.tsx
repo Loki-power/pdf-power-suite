@@ -45,6 +45,12 @@ export default function RootLayout({
               <Link href="/pdf/intelligence" className="transition-colors hover:text-foreground/80 text-foreground/60">
                 OCR & Redaction
               </Link>
+              <Link href="/convert" className="transition-colors hover:text-foreground/80 text-foreground/60">
+                Converter
+              </Link>
+              <Link href="/image" className="transition-colors hover:text-foreground/80 text-foreground/60">
+                Image Tools
+              </Link>
             </nav>
           </div>
         </header>

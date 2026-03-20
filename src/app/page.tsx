@@ -3,7 +3,7 @@ import {
   FilePlusIcon, Grid2x2Icon, ShieldCheckIcon, FileEditIcon, 
   ScanTextIcon, ArrowRightIcon, LockKeyholeIcon, FileUpIcon,
   ZapIcon, FileArchiveIcon, ArrowLeftRightIcon, CheckCircle2Icon,
-  SparklesIcon
+  SparklesIcon, ImageIcon
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -154,6 +154,32 @@ export default function Home() {
                   </div>
                   <CardTitle className="text-xl text-white group-hover:text-rose-400 transition-colors">Protect & Redact</CardTitle>
                   <CardDescription className="text-neutral-400 mt-2">Add passwords, lock printing, or black out sensitive data securely.</CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+
+            {/* Convert PDF/Word */}
+            <Link href="/convert" className="group block">
+              <Card className="h-full border border-white/5 bg-neutral-900/50 backdrop-blur-xl hover:bg-neutral-800/80 transition-all duration-300 hover:shadow-2xl hover:shadow-cyan-500/10 hover:-translate-y-1">
+                <CardHeader className="p-6">
+                  <div className="p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/20 w-fit mb-4 group-hover:bg-cyan-500/20 transition-colors">
+                    <ArrowLeftRightIcon className="h-6 w-6 text-cyan-400" />
+                  </div>
+                  <CardTitle className="text-xl text-white group-hover:text-cyan-400 transition-colors">Universal Converter</CardTitle>
+                  <CardDescription className="text-neutral-400 mt-2">Convert PDF to Word, Image to PDF, or extract images instantly offline.</CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
+
+            {/* Image Tools */}
+            <Link href="/image" className="group block">
+              <Card className="h-full border border-white/5 bg-neutral-900/50 backdrop-blur-xl hover:bg-neutral-800/80 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/10 hover:-translate-y-1">
+                <CardHeader className="p-6">
+                  <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 w-fit mb-4 group-hover:bg-emerald-500/20 transition-colors">
+                    <ImageIcon className="h-6 w-6 text-emerald-400" />
+                  </div>
+                  <CardTitle className="text-xl text-white group-hover:text-emerald-400 transition-colors">Image Studio</CardTitle>
+                  <CardDescription className="text-neutral-400 mt-2">Resize dimensions, convert formats (JPG/PNG), and compress images natively.</CardDescription>
                 </CardHeader>
               </Card>
             </Link>
