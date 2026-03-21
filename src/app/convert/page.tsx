@@ -349,30 +349,30 @@ export default function ConvertPage() {
                   )}
 
                   <Tabs defaultValue="img2pdf" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-2 mb-8 h-auto bg-transparent mb-4 sm:mb-8">
-                      <TabsTrigger value="img2pdf" className="text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
+                    <TabsList className="flex w-full overflow-x-auto snap-x hide-scrollbar gap-2 mb-8 h-auto bg-transparent mb-4 sm:mb-8 pb-2">
+                      <TabsTrigger value="img2pdf" className="shrink-0 text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
                         <ImagePlusIcon className="h-4 w-4 hidden sm:block" /> Image to PDF
                       </TabsTrigger>
-                      <TabsTrigger value="pdf2img" className="text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
+                      <TabsTrigger value="pdf2img" className="shrink-0 text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
                         <ImagesIcon className="h-4 w-4 hidden sm:block" /> PDF to Image
                       </TabsTrigger>
-                      <TabsTrigger value="pdf2word" className="text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
+                      <TabsTrigger value="pdf2word" className="shrink-0 text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
                         <FileTextIcon className="h-4 w-4 hidden sm:block" /> PDF to Word
                       </TabsTrigger>
-                      <TabsTrigger value="word2pdf" className="text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
+                      <TabsTrigger value="word2pdf" className="shrink-0 text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
                         <FileType2Icon className="h-4 w-4 hidden sm:block" /> Word to PDF
                       </TabsTrigger>
                       
-                      <TabsTrigger value="pdf2excel" className="text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
+                      <TabsTrigger value="pdf2excel" className="shrink-0 text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
                         <TableIcon className="h-4 w-4 hidden sm:block" /> PDF to Excel
                       </TabsTrigger>
-                      <TabsTrigger value="excel2pdf" className="text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
+                      <TabsTrigger value="excel2pdf" className="shrink-0 text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
                         <DatabaseIcon className="h-4 w-4 hidden sm:block" /> Excel to PDF
                       </TabsTrigger>
-                      <TabsTrigger value="pdf2ppt" className="text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
+                      <TabsTrigger value="pdf2ppt" className="shrink-0 text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
                         <PresentationIcon className="h-4 w-4 hidden sm:block" /> PDF to PPT
                       </TabsTrigger>
-                      <TabsTrigger value="ppt2pdf" className="text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
+                      <TabsTrigger value="ppt2pdf" className="shrink-0 text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
                         <MonitorPlayIcon className="h-4 w-4 hidden sm:block" /> PPT to PDF
                       </TabsTrigger>
                     </TabsList>

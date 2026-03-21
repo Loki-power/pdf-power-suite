@@ -136,8 +136,8 @@ export default function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
             
-            <ToolCard href="/pdf/split-merge" title="Merge PDF" desc="Combine PDFs in the order you want." icon={Grid2x2Icon} color="orange" />
-            <ToolCard href="/pdf/split-merge" title="Split PDF" desc="Separate pages or extract a whole set." icon={FilePlusIcon} color="blue" />
+            <ToolCard href="/pdf/merge" title="Merge PDF" desc="Combine PDFs in the order you want." icon={Grid2x2Icon} color="orange" />
+            <ToolCard href="/pdf/split" title="Split PDF" desc="Separate pages or extract a whole set." icon={FilePlusIcon} color="blue" />
             <ToolCard href="/pdf/compress" title="Compress PDF" desc="Reduce file size with maximal quality." icon={FileArchiveIcon} color="rose" />
             
             <ToolCard href="/convert" title="PDF to Word" desc="Convert PDF files into easy to edit DOCX." icon={FileTextIcon} color="cyan" />
@@ -153,7 +153,7 @@ export default function Home() {
             <ToolCard href="/convert" title="JPG to PDF" desc="Convert JPG images to PDF." icon={ImagePlusIcon} color="emerald" />
             <ToolCard href="/pdf/sign" title="Sign PDF" desc="Sign yourself electronically." icon={PenToolIcon} color="orange" />
             <ToolCard href="/pdf/watermark" title="Watermark" desc="Stamp an image or text over PDF." icon={LayersIcon} color="blue" />
-            <ToolCard href="/pdf/organize" title="Rotate PDF" desc="Rotate your PDFs exactly as needed." icon={RotateCwIcon} color="cyan" />
+            <ToolCard href="/pdf/rotate" title="Rotate PDF" desc="Rotate your PDFs exactly as needed." icon={RotateCwIcon} color="cyan" />
             <ToolCard href="/pdf/html" title="HTML to PDF" desc="Convert webpages directly to PDF." icon={GlobeIcon} color="emerald" />
             
             <ToolCard href="/pdf/security" title="Unlock PDF" desc="Remove PDF password security." icon={UnlockIcon} color="purple" />

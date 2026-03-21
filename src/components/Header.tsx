@@ -15,8 +15,8 @@ export function Header() {
     {
       title: "ORGANIZE & OPTIMIZE",
       links: [
-        { href: "/pdf/split-merge", label: "Merge PDF", icon: Grid2x2Icon },
-        { href: "/pdf/split-merge", label: "Split PDF", icon: FilePlusIcon },
+        { href: "/pdf/merge", label: "Merge PDF", icon: Grid2x2Icon },
+        { href: "/pdf/split", label: "Split PDF", icon: FilePlusIcon },
         { href: "/pdf/compress", label: "Compress PDF", icon: FileArchiveIcon },
       ]
     },
@@ -44,7 +44,7 @@ export function Header() {
         { href: "/pdf/sign", label: "Sign PDF", icon: PenToolIcon },
         { href: "/pdf/watermark", label: "Watermark", icon: LayersIcon },
         { href: "/pdf/page-numbers", label: "Page Numbers", icon: ListOrderedIcon },
-        { href: "/pdf/organize", label: "Rotate PDF", icon: RotateCwIcon },
+        { href: "/pdf/rotate", label: "Rotate PDF", icon: RotateCwIcon },
       ]
     }
   ];
@@ -79,8 +79,8 @@ export function Header() {
 
           {/* Desktop Nav - Mega Menu Structure */}
           <nav className="hidden lg:flex items-center space-x-2 flex-1 justify-center px-4 font-bold text-sm tracking-wide h-full">
-            <Link href="/pdf/split-merge" className="px-3 py-6 text-slate-700 dark:text-slate-300 hover:text-orange-500 transition-colors">MERGE PDF</Link>
-            <Link href="/pdf/split-merge" className="px-3 py-6 text-slate-700 dark:text-slate-300 hover:text-orange-500 transition-colors">SPLIT PDF</Link>
+            <Link href="/pdf/merge" className="px-3 py-6 text-slate-700 dark:text-slate-300 hover:text-orange-500 transition-colors">MERGE PDF</Link>
+            <Link href="/pdf/split" className="px-3 py-6 text-slate-700 dark:text-slate-300 hover:text-orange-500 transition-colors">SPLIT PDF</Link>
             <Link href="/pdf/compress" className="px-3 py-6 text-slate-700 dark:text-slate-300 hover:text-orange-500 transition-colors">COMPRESS PDF</Link>
 
             {/* CONVERT PDF Dropdown */}
@@ -133,8 +133,8 @@ export function Header() {
                      <div>
                        <div className="text-xs text-slate-400 font-extrabold mb-4 tracking-wider uppercase">Organize PDF</div>
                        <div className="flex flex-col gap-3.5">
-                          <Link href="/pdf/split-merge" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><Grid2x2Icon className="w-4 h-4 text-orange-500"/> Merge PDF</Link>
-                          <Link href="/pdf/split-merge" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><FilePlusIcon className="w-4 h-4 text-blue-500"/> Split PDF</Link>
+                          <Link href="/pdf/merge" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><Grid2x2Icon className="w-4 h-4 text-orange-500"/> Merge PDF</Link>
+                          <Link href="/pdf/split" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><FilePlusIcon className="w-4 h-4 text-blue-500"/> Split PDF</Link>
                           <Link href="/pdf/organize" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><LayoutGridIcon className="w-4 h-4 text-rose-500"/> Organize PDF</Link>
                           <Link href="/pdf/scan" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><ScanIcon className="w-4 h-4 text-emerald-500"/> Scan to PDF</Link>
                        </div>
@@ -177,7 +177,7 @@ export function Header() {
                      <div>
                        <div className="text-xs text-slate-400 font-extrabold mb-4 tracking-wider uppercase">Edit PDF</div>
                        <div className="flex flex-col gap-3.5">
-                          <Link href="/pdf/organize" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><RotateCwIcon className="w-4 h-4 text-cyan-500"/> Rotate PDF</Link>
+                          <Link href="/pdf/rotate" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><RotateCwIcon className="w-4 h-4 text-cyan-500"/> Rotate PDF</Link>
                           <Link href="/pdf/page-numbers" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><ListOrderedIcon className="w-4 h-4 text-cyan-500"/> Add page numbers</Link>
                           <Link href="/pdf/watermark" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><LayersIcon className="w-4 h-4 text-blue-500"/> Add watermark</Link>
                           <Link href="/pdf/crop" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><CropIcon className="w-4 h-4 text-blue-500"/> Crop PDF</Link>

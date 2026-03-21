@@ -34,19 +34,16 @@ interface PageData {
   id: string;
   originalIndex: number;
   thumbnailUrl: string;
-  rotation?: number;
 }
 
 // Draggable Sortable Item Component
 function SortablePage({ 
   page, 
   onDelete, 
-  onRotate,
   index 
 }: { 
   page: PageData, 
   onDelete: (id: string) => void,
-  onRotate: (id: string) => void,
   index: number 
 }) {
   const {
@@ -74,14 +71,6 @@ function SortablePage({
           </div>
           
           <div 
-            className="absolute top-2 right-10 bg-blue-500/90 text-white p-1.5 rounded-md opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity cursor-pointer shadow-sm z-10 hover:bg-blue-600"
-            onClick={(e) => { e.stopPropagation(); onRotate(page.id); }}
-            title="Rotate 90°"
-          >
-            <RotateCwIcon className="h-4 w-4" />
-          </div>
-
-          <div 
             className="absolute top-2 right-2 bg-destructive/90 text-destructive-foreground p-1.5 rounded-md opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity cursor-pointer shadow-sm z-10 hover:bg-destructive"
             onClick={(e) => { e.stopPropagation(); onDelete(page.id); }}
             title="Delete page"
@@ -94,8 +83,7 @@ function SortablePage({
             <img 
               src={page.thumbnailUrl} 
               alt={`Page ${page.originalIndex + 1}`} 
-              className="h-32 sm:h-48 object-contain pointer-events-none drop-shadow-md transition-transform duration-300"
-              style={{ transform: `rotate(${page.rotation || 0}deg)` }}
+              className="h-32 sm:h-48 object-contain pointer-events-none drop-shadow-md"
             />
           </div>
           <div className="flex items-center justify-center mt-2 text-xs text-muted-foreground w-full py-1">
@@ -198,10 +186,6 @@ export default function OrganizePages() {
     setPages(pages.filter(p => p.id !== id));
   };
 
-  const handleRotatePage = (id: string) => {
-    setPages(pages.map(p => p.id === id ? { ...p, rotation: ((p.rotation || 0) + 90) % 360 } : p));
-  };
-
   const saveOrganizedPdf = async () => {
     if (!fileBytes || pages.length === 0) return;
 
@@ -214,14 +198,7 @@ export default function OrganizePages() {
       const indicesToCopy = pages.map(p => p.originalIndex);
       const copiedPages = await newPdf.copyPages(originalPdf, indicesToCopy);
       
-      const { degrees } = await import('pdf-lib');
-      
-      copiedPages.forEach((p, index) => {
-        const rotation = pages[index].rotation || 0;
-        if (rotation !== 0) {
-          const currentRotation = p.getRotation().angle;
-          p.setRotation(degrees(currentRotation + rotation));
-        }
+      copiedPages.forEach((p) => {
         newPdf.addPage(p);
       });
       
@@ -304,7 +281,6 @@ export default function OrganizePages() {
                         page={page} 
                         index={index}
                         onDelete={handleDeletePage}
-                        onRotate={handleRotatePage}
                       />
                     ))}
                   </div>
