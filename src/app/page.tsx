@@ -170,9 +170,6 @@ export default function Home() {
             
             <ToolCard href="/pdf/intelligence" title="Redact PDF" desc="Permanently remove sensitive info." icon={EyeOffIcon} color="orange" />
             <ToolCard href="/pdf/crop" title="Crop PDF" desc="Crop margins of PDF documents." icon={CropIcon} color="blue" />
-            
-            <ToolCard href="/pdf/intelligence" title="AI Summarizer" desc="Quickly generate clear summaries." icon={CpuIcon} color="cyanBadge" />
-            <ToolCard href="/pdf/intelligence" title="Translate PDF" desc="Translate files perfectly intact." icon={GlobeIcon} color="emeraldBadge" />
 
           </div>
         </div>
