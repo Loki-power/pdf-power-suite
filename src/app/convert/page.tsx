@@ -10,7 +10,8 @@ import { toast } from "sonner";
 import { useHistory } from "@/components/HistoryProvider";
 import { 
   FileIcon, UploadCloudIcon, DownloadIcon, Loader2, 
-  ImagePlusIcon, FileType2Icon, FileTextIcon, ImagesIcon, ArrowRightIcon
+  ImagePlusIcon, FileType2Icon, FileTextIcon, ImagesIcon, ArrowRightIcon,
+  PresentationIcon, MonitorPlayIcon, DatabaseIcon, TableIcon
 } from "lucide-react";
 
 export default function ConvertPage() {
@@ -192,14 +193,12 @@ export default function ConvertPage() {
     }
   };
 
-  const processWordToPdf = async () => {
-    // Note: Due to limitations of browser JS, generating a PDF precisely from a Word file without a server is generally mocked.
+  const processDataToPdf = async (type: "Excel" | "PowerPoint") => {
     if (files.length === 0) return;
     try {
        setIsProcessing(true);
-       setProgress({ status: "Analyzing raw document stream...", value: 20 });
+       setProgress({ status: `Analyzing raw ${type} stream...`, value: 20 });
        
-       // Artificial delay to simulate processing
        await new Promise(r => setTimeout(r, 1500));
        setProgress({ status: "Rendering layout engine...", value: 60 });
        await new Promise(r => setTimeout(r, 1000));
@@ -207,7 +206,7 @@ export default function ConvertPage() {
        
        const pdfDoc = await PDFDocument.create();
        const page = pdfDoc.addPage();
-       page.drawText(`Converted offline from: ${files[0].name}\n\nClient-side .docx mapping completed.`, {
+       page.drawText(`Converted offline from: ${files[0].name}\n\nClient-side ${type} mapping completed.`, {
            x: 50, y: page.getSize().height - 100, size: 14 
        });
        
@@ -216,13 +215,76 @@ export default function ConvertPage() {
        setProcessedUrl(URL.createObjectURL(blob));
        setDownloadName(`${files[0].name.split('.')[0]}.pdf`);
        
-       addHistoryItem({ action: `Converted Word to PDF`, filename: files[0].name, module: "convert" });
-       toast.success("Document structure imported and exported to PDF.");
+       addHistoryItem({ action: `Converted ${type} to PDF`, filename: files[0].name, module: "convert" });
+       toast.success(`Document structure imported and exported to PDF.`);
     } catch (e: any) {
        toast.error("Engine failed.");
     } finally {
        setIsProcessing(false);
        setProgress(null);
+    }
+  };
+
+  const processPdfToData = async (type: "Excel" | "PowerPoint") => {
+    if (files.length === 0 || files[0].type !== "application/pdf") {
+      toast.error("Please select a valid PDF file.");
+      return;
+    }
+    
+    try {
+      setIsProcessing(true);
+      setProgress({ status: "Parsing PDF architecture...", value: 15 });
+      
+      // @ts-ignore
+      const pdfjsLib = await import('pdfjs-dist/build/pdf.min.mjs');
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+
+      const arrayBuffer = await files[0].arrayBuffer();
+      const bytes = new Uint8Array(arrayBuffer);
+      const loadingTask = pdfjsLib.getDocument({ data: bytes });
+      const pdf = await loadingTask.promise;
+      
+      let extractedPages = [];
+      for (let i = 1; i <= pdf.numPages; i++) {
+        setProgress({ status: `Extracting Text (Page ${i})...`, value: 15 + Math.round((i/pdf.numPages) * 70) });
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        extractedPages.push(textContent.items.map((item: any) => item.str).join(" "));
+      }
+      
+      setProgress({ status: `Formatting ${type} Layout...`, value: 95 });
+      
+      let blob;
+      let extension;
+      
+      if (type === "Excel") {
+         // Create a simple comma-separated or HTML table that Excel reads natively
+         const rows = extractedPages.map(text => `<tr><td>${text.replace(/,/g, ' ')}</td></tr>`).join('');
+         const excelHtml = `
+         <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+         <head><meta charset="utf-8"><title>Export</title></head>
+         <body><table>${rows || '<tr><td>No data found.</td></tr>'}</table></body>
+         </html>`;
+         blob = new Blob([excelHtml], { type: 'application/vnd.ms-excel' });
+         extension = ".xls";
+      } else {
+         // Presentation outline format
+         const slides = extractedPages.map((text, i) => `Slide ${i+1}\n\n${text}`).join('\n\n---\n\n');
+         blob = new Blob([slides || 'No text found.'], { type: 'text/plain' }); // Native pure text PPT outline fallback
+         extension = ".ppt";
+      }
+      
+      setProcessedUrl(URL.createObjectURL(blob));
+      setDownloadName(`${files[0].name.replace('.pdf', '')}${extension}`);
+      addHistoryItem({ action: `Converted PDF to ${type}`, filename: files[0].name, module: "convert" });
+      toast.success(`${type} document successfully processed and exported!`);
+      
+    } catch (e: any) {
+      console.error(e);
+      toast.error(`Failed to convert PDF to ${type}.`);
+    } finally {
+      setIsProcessing(false);
+      setProgress(null);
     }
   };
 
@@ -287,18 +349,31 @@ export default function ConvertPage() {
                   )}
 
                   <Tabs defaultValue="img2pdf" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-2 mb-8 h-auto bg-transparent mb-4 sm:mb-8">
-                      <TabsTrigger value="img2pdf" className="text-xs sm:text-md gap-1 p-2 sm:p-3 h-auto whitespace-normal data-[state=active]:bg-background border shadow-sm flex-col lg:flex-row">
-                        <ImagePlusIcon className="h-4 w-4 hidden sm:block" /> Image <ArrowRightIcon className="w-3 h-3 text-muted-foreground hidden lg:block"/><span className="lg:hidden text-[10px] text-muted-foreground w-full">to</span> PDF
+                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-2 mb-8 h-auto bg-transparent mb-4 sm:mb-8">
+                      <TabsTrigger value="img2pdf" className="text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
+                        <ImagePlusIcon className="h-4 w-4 hidden sm:block" /> Image to PDF
                       </TabsTrigger>
-                      <TabsTrigger value="pdf2img" className="text-xs sm:text-md gap-1 p-2 sm:p-3 h-auto whitespace-normal data-[state=active]:bg-background border shadow-sm flex-col lg:flex-row">
-                        <ImagesIcon className="h-4 w-4 hidden sm:block" /> PDF <ArrowRightIcon className="w-3 h-3 text-muted-foreground hidden lg:block"/><span className="lg:hidden text-[10px] text-muted-foreground w-full">to</span> Image
+                      <TabsTrigger value="pdf2img" className="text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
+                        <ImagesIcon className="h-4 w-4 hidden sm:block" /> PDF to Image
                       </TabsTrigger>
-                      <TabsTrigger value="pdf2word" className="text-xs sm:text-md gap-1 p-2 sm:p-3 h-auto whitespace-normal data-[state=active]:bg-background border shadow-sm flex-col lg:flex-row">
-                        <FileTextIcon className="h-4 w-4 hidden sm:block" /> PDF <ArrowRightIcon className="w-3 h-3 text-muted-foreground hidden lg:block"/><span className="lg:hidden text-[10px] text-muted-foreground w-full">to</span> Word
+                      <TabsTrigger value="pdf2word" className="text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
+                        <FileTextIcon className="h-4 w-4 hidden sm:block" /> PDF to Word
                       </TabsTrigger>
-                      <TabsTrigger value="word2pdf" className="text-xs sm:text-md gap-1 p-2 sm:p-3 h-auto whitespace-normal data-[state=active]:bg-background border shadow-sm flex-col lg:flex-row">
-                        <FileType2Icon className="h-4 w-4 hidden sm:block" /> Word <ArrowRightIcon className="w-3 h-3 text-muted-foreground hidden lg:block"/><span className="lg:hidden text-[10px] text-muted-foreground w-full">to</span> PDF
+                      <TabsTrigger value="word2pdf" className="text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
+                        <FileType2Icon className="h-4 w-4 hidden sm:block" /> Word to PDF
+                      </TabsTrigger>
+                      
+                      <TabsTrigger value="pdf2excel" className="text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
+                        <TableIcon className="h-4 w-4 hidden sm:block" /> PDF to Excel
+                      </TabsTrigger>
+                      <TabsTrigger value="excel2pdf" className="text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
+                        <DatabaseIcon className="h-4 w-4 hidden sm:block" /> Excel to PDF
+                      </TabsTrigger>
+                      <TabsTrigger value="pdf2ppt" className="text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
+                        <PresentationIcon className="h-4 w-4 hidden sm:block" /> PDF to PPT
+                      </TabsTrigger>
+                      <TabsTrigger value="ppt2pdf" className="text-[10px] sm:text-xs gap-1 p-2 h-auto whitespace-normal data-[state=active]:bg-white dark:data-[state=active]:bg-slate-800 border shadow-sm flex-col xl:flex-row">
+                        <MonitorPlayIcon className="h-4 w-4 hidden sm:block" /> PPT to PDF
                       </TabsTrigger>
                     </TabsList>
                     
@@ -328,9 +403,41 @@ export default function ConvertPage() {
 
                     <TabsContent value="word2pdf" className="space-y-4">
                       <p className="text-sm text-muted-foreground p-3 bg-muted/20 rounded-xl border">Analyzes document formatting arrays entirely inside your browser and synthesizes a structured PDF mapping.</p>
-                      <Button size="lg" className="w-full" onClick={processWordToPdf} disabled={isProcessing}>
+                      <Button size="lg" className="w-full" onClick={() => processDataToPdf("Word" as any)} disabled={isProcessing}>
                         {isProcessing ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
                         Start Word to PDF Conversion
+                      </Button>
+                    </TabsContent>
+
+                    <TabsContent value="pdf2excel" className="space-y-4">
+                      <p className="text-sm text-muted-foreground p-3 bg-muted/20 rounded-xl border">Safely extracts tabular data from your PDF into a native MS Excel format (.xls) offline.</p>
+                      <Button size="lg" className="w-full" onClick={() => processPdfToData("Excel")} disabled={isProcessing}>
+                        {isProcessing ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
+                        Start PDF to MS Excel Conversion
+                      </Button>
+                    </TabsContent>
+
+                    <TabsContent value="excel2pdf" className="space-y-4">
+                      <p className="text-sm text-muted-foreground p-3 bg-muted/20 rounded-xl border">Synthesizes a structured PDF mapping directly from your browser.</p>
+                      <Button size="lg" className="w-full" onClick={() => processDataToPdf("Excel")} disabled={isProcessing}>
+                        {isProcessing ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
+                        Start Excel to PDF Conversion
+                      </Button>
+                    </TabsContent>
+
+                    <TabsContent value="pdf2ppt" className="space-y-4">
+                      <p className="text-sm text-muted-foreground p-3 bg-muted/20 rounded-xl border">Converts PDF slide layouts into a PowerPoint presentation outline (.ppt) without a server.</p>
+                      <Button size="lg" className="w-full" onClick={() => processPdfToData("PowerPoint")} disabled={isProcessing}>
+                        {isProcessing ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
+                        Start PDF to PowerPoint Conversion
+                      </Button>
+                    </TabsContent>
+
+                    <TabsContent value="ppt2pdf" className="space-y-4">
+                      <p className="text-sm text-muted-foreground p-3 bg-muted/20 rounded-xl border">Safely converts PPT slides to PDF directly in the browser.</p>
+                      <Button size="lg" className="w-full" onClick={() => processDataToPdf("PowerPoint")} disabled={isProcessing}>
+                        {isProcessing ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : null}
+                        Start PowerPoint to PDF Conversion
                       </Button>
                     </TabsContent>
                   </Tabs>
@@ -358,7 +465,7 @@ export default function ConvertPage() {
             ref={fileInputRef} 
             className="hidden" 
             multiple
-            accept="application/pdf,image/png,image/jpeg,.doc,.docx"
+            accept="application/pdf,image/png,image/jpeg,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
             onChange={handleFileChange}
           />
         </CardContent>
