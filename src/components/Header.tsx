@@ -11,12 +11,42 @@ export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
-  const mobileLinks = [
-    { href: "/pdf/split-merge", label: "MERGE PDF" },
-    { href: "/pdf/split-merge", label: "SPLIT PDF" },
-    { href: "/pdf/compress", label: "COMPRESS PDF" },
-    { href: "/convert", label: "CONVERT PDF" },
-    { href: "/pdf/organize", label: "ALL PDF TOOLS" },
+  const mobileCategories = [
+    {
+      title: "ORGANIZE & OPTIMIZE",
+      links: [
+        { href: "/pdf/split-merge", label: "Merge PDF", icon: Grid2x2Icon },
+        { href: "/pdf/split-merge", label: "Split PDF", icon: FilePlusIcon },
+        { href: "/pdf/compress", label: "Compress PDF", icon: FileArchiveIcon },
+      ]
+    },
+    {
+      title: "CONVERT TO PDF",
+      links: [
+        { href: "/convert", label: "JPG to PDF", icon: ImagePlusIcon },
+        { href: "/convert", label: "WORD to PDF", icon: FileTextIcon },
+        { href: "/convert", label: "EXCEL to PDF", icon: DatabaseIcon },
+        { href: "/convert", label: "PPT to PDF", icon: PresentationIcon },
+      ]
+    },
+    {
+      title: "CONVERT FROM PDF",
+      links: [
+        { href: "/convert", label: "PDF to JPG", icon: ImagesIcon },
+        { href: "/convert", label: "PDF to WORD", icon: FileTextIcon },
+        { href: "/convert", label: "PDF to EXCEL", icon: DatabaseIcon },
+        { href: "/convert", label: "PDF to PPT", icon: PresentationIcon },
+      ]
+    },
+    {
+      title: "EDIT & SECURITY",
+      links: [
+        { href: "/pdf/sign", label: "Sign PDF", icon: PenToolIcon },
+        { href: "/pdf/watermark", label: "Watermark", icon: LayersIcon },
+        { href: "/pdf/page-numbers", label: "Page Numbers", icon: ListOrderedIcon },
+        { href: "/pdf/organize", label: "Rotate PDF", icon: RotateCwIcon },
+      ]
+    }
   ];
 
   return (
@@ -195,28 +225,38 @@ export function Header() {
 
         {/* Mobile Dropdown Menu */}
         {isOpen && (
-          <div className="lg:hidden absolute top-full left-0 w-full bg-slate-950/95 backdrop-blur-3xl border-b border-white/5 shadow-2xl p-4 flex flex-col gap-2 max-h-[calc(100vh-5rem)] overflow-y-auto animate-in slide-in-from-top-2">
-            {mobileLinks.map((link) => {
-              const isActive = pathname === link.href || pathname.startsWith(link.href + "/");
-              return (
-                <Link 
-                  key={link.label} 
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className={`px-4 py-3 rounded-xl text-base font-bold transition-all flex items-center ${
-                    isActive 
-                      ? "bg-gradient-to-r from-orange-500/10 to-rose-600/10 text-orange-400 border border-orange-500/20" 
-                      : "text-slate-400 hover:text-white hover:bg-white/5"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-            <div className="pt-4 mt-2 border-t border-white/10">
+          <div className="lg:hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-3xl border-b border-slate-200 shadow-2xl p-4 flex flex-col gap-4 max-h-[calc(100vh-5rem)] overflow-y-auto animate-in slide-in-from-top-2">
+            {mobileCategories.map((category, idx) => (
+               <div key={idx} className="space-y-3">
+                 <div className="text-xs font-black text-slate-400 tracking-wider uppercase pl-2">{category.title}</div>
+                 <div className="grid grid-cols-2 gap-2">
+                   {category.links.map((link) => {
+                     const isActive = pathname === link.href || pathname.startsWith(link.href + "/");
+                     const Icon = link.icon;
+                     return (
+                       <Link 
+                         key={link.label} 
+                         href={link.href}
+                         onClick={() => setIsOpen(false)}
+                         className={`px-3 py-2.5 rounded-xl text-[13px] font-bold transition-all flex items-center gap-2 ${
+                           isActive 
+                             ? "bg-rose-50 text-rose-600 border border-rose-200" 
+                             : "text-slate-600 hover:text-rose-600 hover:bg-slate-50 border border-transparent"
+                         }`}
+                       >
+                         <Icon className="w-4 h-4" />
+                         <span className="truncate">{link.label}</span>
+                       </Link>
+                     );
+                   })}
+                 </div>
+               </div>
+            ))}
+            
+            <div className="pt-4 mt-2 border-t border-slate-200">
               <Link href="/pdf/organize" onClick={() => setIsOpen(false)}>
                  <Button className="w-full h-14 bg-gradient-to-r from-orange-500 to-rose-600 text-white rounded-xl font-bold text-lg shadow-lg shadow-orange-500/20 active:scale-[0.98] transition-transform">
-                    Get Started Now
+                    All PDF Tools
                  </Button>
               </Link>
             </div>

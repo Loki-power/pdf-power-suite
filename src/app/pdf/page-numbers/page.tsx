@@ -122,7 +122,7 @@ export default function PageNumbersPDF() {
 
               {!processedUrl ? (
                 <div className="space-y-6">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="grid gap-2">
                        <Label htmlFor="pprefix">Prefix text</Label>
                        <Input id="pprefix" placeholder="e.g. Page " value={pageNumPrefix} onChange={(e) => setPageNumPrefix(e.target.value)} />
