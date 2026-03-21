@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { MenuIcon, XIcon, ShieldCheckIcon, LockKeyholeIcon, CpuIcon } from "lucide-react";
 import { useState } from "react";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -70,6 +71,7 @@ export function Header() {
 
           {/* User Actions / CTA */}
           <div className="hidden lg:flex items-center gap-3">
+            <ThemeToggle />
             <Link href="/pdf/organize">
                <Button className="bg-gradient-to-r from-orange-500 to-rose-600 hover:from-orange-400 hover:to-rose-500 text-white border-0 shadow-lg shadow-orange-500/20 rounded-full px-6 font-bold transition-transform hover:scale-105">
                   Get Started
@@ -78,13 +80,16 @@ export function Header() {
           </div>
 
           {/* Mobile Menu Toggle */}
-          <button 
+          <div className="lg:hidden flex items-center gap-2">
+            <ThemeToggle />
+            <button 
             className="lg:hidden p-2 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500/50"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
             {isOpen ? <XIcon className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
           </button>
+          </div>
         </div>
 
         {/* Mobile Dropdown Menu */}

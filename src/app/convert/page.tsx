@@ -287,18 +287,18 @@ export default function ConvertPage() {
                   )}
 
                   <Tabs defaultValue="img2pdf" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-8 h-auto">
-                      <TabsTrigger value="img2pdf" className="text-md gap-1 p-3">
-                        <ImagePlusIcon className="h-4 w-4 hidden sm:block" /> Image <ArrowRightIcon className="w-3 h-3 text-muted-foreground"/> PDF
+                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-2 mb-8 h-auto bg-transparent mb-4 sm:mb-8">
+                      <TabsTrigger value="img2pdf" className="text-xs sm:text-md gap-1 p-2 sm:p-3 h-auto whitespace-normal data-[state=active]:bg-background border shadow-sm flex-col lg:flex-row">
+                        <ImagePlusIcon className="h-4 w-4 hidden sm:block" /> Image <ArrowRightIcon className="w-3 h-3 text-muted-foreground hidden lg:block"/><span className="lg:hidden text-[10px] text-muted-foreground w-full">to</span> PDF
                       </TabsTrigger>
-                      <TabsTrigger value="pdf2img" className="text-md gap-1 p-3">
-                        <ImagesIcon className="h-4 w-4 hidden sm:block" /> PDF <ArrowRightIcon className="w-3 h-3 text-muted-foreground"/> Image
+                      <TabsTrigger value="pdf2img" className="text-xs sm:text-md gap-1 p-2 sm:p-3 h-auto whitespace-normal data-[state=active]:bg-background border shadow-sm flex-col lg:flex-row">
+                        <ImagesIcon className="h-4 w-4 hidden sm:block" /> PDF <ArrowRightIcon className="w-3 h-3 text-muted-foreground hidden lg:block"/><span className="lg:hidden text-[10px] text-muted-foreground w-full">to</span> Image
                       </TabsTrigger>
-                      <TabsTrigger value="pdf2word" className="text-md gap-1 p-3">
-                        <FileTextIcon className="h-4 w-4 hidden sm:block" /> PDF <ArrowRightIcon className="w-3 h-3 text-muted-foreground"/> Word
+                      <TabsTrigger value="pdf2word" className="text-xs sm:text-md gap-1 p-2 sm:p-3 h-auto whitespace-normal data-[state=active]:bg-background border shadow-sm flex-col lg:flex-row">
+                        <FileTextIcon className="h-4 w-4 hidden sm:block" /> PDF <ArrowRightIcon className="w-3 h-3 text-muted-foreground hidden lg:block"/><span className="lg:hidden text-[10px] text-muted-foreground w-full">to</span> Word
                       </TabsTrigger>
-                      <TabsTrigger value="word2pdf" className="text-md gap-1 p-3">
-                        <FileType2Icon className="h-4 w-4 hidden sm:block" /> Word <ArrowRightIcon className="w-3 h-3 text-muted-foreground"/> PDF
+                      <TabsTrigger value="word2pdf" className="text-xs sm:text-md gap-1 p-2 sm:p-3 h-auto whitespace-normal data-[state=active]:bg-background border shadow-sm flex-col lg:flex-row">
+                        <FileType2Icon className="h-4 w-4 hidden sm:block" /> Word <ArrowRightIcon className="w-3 h-3 text-muted-foreground hidden lg:block"/><span className="lg:hidden text-[10px] text-muted-foreground w-full">to</span> PDF
                       </TabsTrigger>
                     </TabsList>
                     

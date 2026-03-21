@@ -18,7 +18,8 @@ import {
   TagsIcon,
   FileIcon,
   EraserIcon,
-  LayersIcon
+  LayersIcon,
+  HashIcon
 } from "lucide-react";
 
 export default function Finishing() {
@@ -37,6 +38,10 @@ export default function Finishing() {
   // Bates state
   const [batesPrefix, setBatesPrefix] = useState("CASE-");
   const [batesStartPos, setBatesStartPos] = useState(1);
+
+  // Page Num state
+  const [pageNumPrefix, setPageNumPrefix] = useState("Page ");
+  const [pageNumSuffix, setPageNumSuffix] = useState(" of {total}");
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [processedUrl, setProcessedUrl] = useState<string | null>(null);
@@ -193,6 +198,38 @@ export default function Finishing() {
     }
   };
 
+  const processPageNumbers = async () => {
+    if (!fileBytes) return;
+    try {
+      setIsProcessing(true);
+      const pdfDoc = await PDFDocument.load(fileBytes);
+      const pages = pdfDoc.getPages();
+      
+      for (let i = 0; i < pages.length; i++) {
+        const page = pages[i];
+        const { width } = page.getSize();
+        const stamp = `${pageNumPrefix}${i + 1}${pageNumSuffix.replace('{total}', pages.length.toString())}`;
+        
+        page.drawText(stamp, {
+          x: width / 2 - (stamp.length * 4),
+          y: 30, // Bottom center
+          size: 12,
+          color: rgb(0.2, 0.2, 0.2),
+        });
+      }
+
+      const pdfBytesModified = await pdfDoc.save();
+      const blob = new Blob([pdfBytesModified as any], { type: "application/pdf" });
+      setProcessedUrl(URL.createObjectURL(blob));
+      addHistoryItem({ action: "Added Page Numbers", filename: file?.name || "document", module: "finishing" });
+      toast.success(`Page numbers applied to ${pages.length} pages!`);
+    } catch (e: any) {
+      toast.error("Failed to apply Page Numbers.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const processFlatten = async () => {
     if (!fileBytes) return;
     try {
@@ -303,17 +340,20 @@ export default function Finishing() {
 
               {!processedUrl ? (
                 <Tabs defaultValue="watermark" className="w-full">
-                  <TabsList className="grid w-full grid-cols-4 mb-8 h-12">
-                    <TabsTrigger value="watermark" className="text-md gap-1">
+                  <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 gap-2 mb-8 h-auto mb-4">
+                    <TabsTrigger value="watermark" className="text-sm gap-1 h-auto py-2">
                       <FileEditIcon className="h-4 w-4 hidden sm:block" /> <span className="hidden sm:inline">Watermark</span><span className="sm:hidden">Mark</span>
                     </TabsTrigger>
-                    <TabsTrigger value="sign" className="text-md gap-1">
+                    <TabsTrigger value="sign" className="text-sm gap-1 h-auto py-2">
                       <FingerprintIcon className="h-4 w-4 hidden sm:block" /> e-Sign
                     </TabsTrigger>
-                    <TabsTrigger value="bates" className="text-md gap-1">
-                      <TagsIcon className="h-4 w-4 hidden sm:block" /> <span className="hidden sm:inline">Bates Num</span><span className="sm:hidden">Tags</span>
+                    <TabsTrigger value="pagenum" className="text-sm gap-1 h-auto py-2">
+                      <HashIcon className="h-4 w-4 hidden sm:block" /> <span className="hidden sm:inline">Page Num</span><span className="sm:hidden">Num</span>
                     </TabsTrigger>
-                    <TabsTrigger value="flatten" className="text-md gap-1">
+                    <TabsTrigger value="bates" className="text-sm gap-1 h-auto py-2">
+                      <TagsIcon className="h-4 w-4 hidden sm:block" /> <span className="hidden sm:inline">Bates Num</span><span className="sm:hidden">Bates</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="flatten" className="text-sm gap-1 h-auto py-2 col-span-2 lg:col-span-1">
                       <LayersIcon className="h-4 w-4 hidden sm:block" /> Flatten
                     </TabsTrigger>
                   </TabsList>
@@ -396,6 +436,27 @@ export default function Finishing() {
                     <Button size="lg" className="w-full" onClick={processBates} disabled={isProcessing}>
                       {isProcessing ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <TagsIcon className="mr-2 h-5 w-5" />}
                       Apply Bates Stamp
+                    </Button>
+                  </TabsContent>
+
+                  {/* PAGE NUMBERS */}
+                  <TabsContent value="pagenum" className="space-y-6">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="grid gap-2">
+                         <Label htmlFor="pprefix">Prefix text</Label>
+                         <Input id="pprefix" placeholder="e.g. Page " value={pageNumPrefix} onChange={(e) => setPageNumPrefix(e.target.value)} />
+                      </div>
+                      <div className="grid gap-2">
+                         <Label htmlFor="psuffix">Suffix (use {`{total}`} for max pages)</Label>
+                         <Input id="psuffix" placeholder="e.g. of {total}" value={pageNumSuffix} onChange={(e) => setPageNumSuffix(e.target.value)} />
+                      </div>
+                    </div>
+                    <div className="p-4 bg-muted/20 border rounded-xl text-center">
+                       <p className="text-sm font-mono text-muted-foreground">Preview format: {pageNumPrefix}1{pageNumSuffix.replace('{total}', '10')}</p>
+                    </div>
+                    <Button size="lg" className="w-full" onClick={processPageNumbers} disabled={isProcessing}>
+                      {isProcessing ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <HashIcon className="mr-2 h-5 w-5" />}
+                      Apply Page Numbers
                     </Button>
                   </TabsContent>
 

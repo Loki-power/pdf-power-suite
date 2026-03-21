@@ -24,8 +24,11 @@ import {
   ShieldCheckIcon,
   ShieldAlertIcon,
   FileIcon,
-  LockIcon
+  LockIcon,
+  UnlockIcon
 } from "lucide-react";
+
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Security() {
   const [file, setFile] = useState<File | null>(null);
@@ -33,6 +36,7 @@ export default function Security() {
   const [preventPrint, setPreventPrint] = useState(false);
   const [preventCopy, setPreventCopy] = useState(false);
   const [preventModify, setPreventModify] = useState(false);
+  const [unlockPassword, setUnlockPassword] = useState("");
   
   const { addHistoryItem } = useHistory();
   
@@ -106,6 +110,27 @@ export default function Security() {
     }
   };
 
+  const processUnlock = async () => {
+    if (!file) return;
+    try {
+      setIsProcessing(true);
+      const arrayBuffer = await file.arrayBuffer();
+      
+      const pdfDoc = await PDFDocument.load(arrayBuffer, { password: unlockPassword || undefined, ignoreEncryption: false } as any);
+      
+      const pdfBytes = await pdfDoc.save();
+      const blob = new Blob([pdfBytes as any], { type: "application/pdf" });
+      setProcessedUrl(URL.createObjectURL(blob));
+      addHistoryItem({ action: "Unlocked PDF", filename: file.name, module: "security" });
+      toast.success("PDF unlocked successfully!");
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e.message?.includes("password") ? "Incorrect password." : "Failed to unlock document.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const triggerDownload = () => {
     if (!processedUrl) return;
     const a = document.createElement("a");
@@ -154,75 +179,110 @@ export default function Security() {
               </div>
 
               {!processedUrl ? (
-                <div className="space-y-8 animate-in fade-in">
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-2">
-                       <LockIcon className="h-5 w-5 text-purple-500" />
-                       <h3 className="text-lg font-semibold">Password Protection</h3>
+                <Tabs defaultValue="protect" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 mb-8">
+                    <TabsTrigger value="protect" className="text-md gap-2">
+                       <LockIcon className="h-4 w-4" /> Protect
+                    </TabsTrigger>
+                    <TabsTrigger value="unlock" className="text-md gap-2">
+                       <UnlockIcon className="h-4 w-4" /> Unlock
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="protect" className="space-y-8 animate-in fade-in">
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-2">
+                         <LockIcon className="h-5 w-5 text-purple-500" />
+                         <h3 className="text-lg font-semibold">Password Protection</h3>
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="password">Document Password (Optional)</Label>
+                        <Input 
+                          id="password" 
+                          type="password" 
+                          placeholder="Leave blank for no password" 
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="max-w-md"
+                        />
+                        <p className="text-xs text-muted-foreground">Users will be required to enter this password to view the PDF.</p>
+                      </div>
                     </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="password">Document Password (Optional)</Label>
-                      <Input 
-                        id="password" 
-                        type="password" 
-                        placeholder="Leave blank for no password" 
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="max-w-md"
-                      />
-                      <p className="text-xs text-muted-foreground">Users will be required to enter this password to view the PDF.</p>
-                    </div>
-                  </div>
 
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-2">
-                       <ShieldAlertIcon className="h-5 w-5 text-purple-500" />
-                       <h3 className="text-lg font-semibold">Permission Restrictions</h3>
-                    </div>
-                    
-                    <div className="grid gap-4 bg-muted/20 p-4 rounded-xl border">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <Label className="text-base">Disable Printing</Label>
-                          <p className="text-xs text-muted-foreground">Prevent viewers from printing the document.</p>
-                        </div>
-                        <Switch checked={preventPrint} onCheckedChange={setPreventPrint} />
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-2">
+                         <ShieldAlertIcon className="h-5 w-5 text-purple-500" />
+                         <h3 className="text-lg font-semibold">Permission Restrictions</h3>
                       </div>
                       
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <Label className="text-base">Disable Text Copying</Label>
-                          <p className="text-xs text-muted-foreground">Prevent highlighting and copying text.</p>
+                      <div className="grid gap-4 bg-muted/20 p-4 rounded-xl border">
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label className="text-base">Disable Printing</Label>
+                            <p className="text-xs text-muted-foreground">Prevent viewers from printing the document.</p>
+                          </div>
+                          <Switch checked={preventPrint} onCheckedChange={setPreventPrint} />
                         </div>
-                        <Switch checked={preventCopy} onCheckedChange={setPreventCopy} />
-                      </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label className="text-base">Disable Text Copying</Label>
+                            <p className="text-xs text-muted-foreground">Prevent highlighting and copying text.</p>
+                          </div>
+                          <Switch checked={preventCopy} onCheckedChange={setPreventCopy} />
+                        </div>
 
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <Label className="text-base">Disable Modifications</Label>
-                          <p className="text-xs text-muted-foreground">Prevent editing, adding signatures, or filling forms.</p>
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label className="text-base">Disable Modifications</Label>
+                            <p className="text-xs text-muted-foreground">Prevent editing, adding signatures, or filling forms.</p>
+                          </div>
+                          <Switch checked={preventModify} onCheckedChange={setPreventModify} />
                         </div>
-                        <Switch checked={preventModify} onCheckedChange={setPreventModify} />
                       </div>
                     </div>
-                  </div>
 
-                  <Button 
-                    size="lg" 
-                    className="w-full text-lg bg-purple-600 hover:bg-purple-700 text-white" 
-                    onClick={processSecurity} 
-                    disabled={isProcessing}
-                  >
-                    {isProcessing ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Securing Document...
-                      </>
-                    ) : (
-                      "Apply Security Settings"
-                    )}
-                  </Button>
-                </div>
+                    <Button 
+                      size="lg" 
+                      className="w-full text-lg bg-purple-600 hover:bg-purple-700 text-white" 
+                      onClick={processSecurity} 
+                      disabled={isProcessing}
+                    >
+                      {isProcessing ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Securing Document...
+                        </>
+                      ) : (
+                        "Apply Security Settings"
+                      )}
+                    </Button>
+                  </TabsContent>
+                  
+                  <TabsContent value="unlock" className="space-y-8 animate-in fade-in">
+                     <div className="space-y-4">
+                        <div className="flex items-center space-x-2">
+                           <UnlockIcon className="h-5 w-5 text-purple-500" />
+                           <h3 className="text-lg font-semibold">Remove Password & Restrictions</h3>
+                        </div>
+                        <div className="grid gap-2">
+                           <Label htmlFor="unlock-pw">Current Password (if known)</Label>
+                           <Input 
+                             id="unlock-pw" 
+                             type="password" 
+                             placeholder="Enter current file password"
+                             value={unlockPassword}
+                             onChange={(e) => setUnlockPassword(e.target.value)}
+                             className="max-w-md"
+                           />
+                           <p className="text-xs text-muted-foreground">If the document has an open password, enter it here. We will strip the security and output a clean PDF.</p>
+                        </div>
+                        <Button size="lg" className="w-full text-lg bg-emerald-600 hover:bg-emerald-700 text-white" onClick={processUnlock} disabled={isProcessing}>
+                          {isProcessing ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : "Unlock Document"}
+                        </Button>
+                     </div>
+                  </TabsContent>
+                </Tabs>
               ) : (
                 <div className="flex flex-col items-center justify-center p-8 space-y-6 bg-green-500/5 border border-green-500/20 rounded-xl animate-in zoom-in-95">
                   <div className="h-16 w-16 rounded-full bg-green-500/20 flex items-center justify-center">

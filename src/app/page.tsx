@@ -4,6 +4,10 @@ import {
   ArrowRightIcon, LockKeyholeIcon, FileUpIcon,
   ZapIcon, FileArchiveIcon, ArrowLeftRightIcon,
   SparklesIcon, ImageIcon, FileTextIcon, ImagePlusIcon,
+  ImagesIcon, EditIcon, PresentationIcon, DatabaseIcon, 
+  ListOrderedIcon, UnlockIcon, LockIcon, RotateCwIcon, 
+  ScanIcon, SearchIcon, LayersIcon, SettingsIcon, PenToolIcon, 
+  WrenchIcon, EyeOffIcon, CropIcon, CpuIcon, GlobeIcon, LayoutGridIcon,
   LucideIcon
 } from "lucide-react";
 import Link from "next/link";
@@ -84,100 +88,91 @@ export default function Home() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 opacity-90 hover:opacity-100 transition-opacity duration-500">
                  
                  {/* Format 1: PDF */}
-                 <div className="group relative flex flex-col items-center p-8 sm:p-10 rounded-3xl bg-slate-950/80 border border-white/10 hover:border-red-500/50 hover:bg-slate-900/90 transition-all duration-300 hover:shadow-[0_0_40px_-10px_rgba(239,68,68,0.3)] hover:-translate-y-2 overflow-hidden">
+                 <Link href="/pdf/split-merge" className="group relative flex flex-col items-center p-8 sm:p-10 rounded-3xl bg-slate-950/80 border border-white/10 hover:border-red-500/50 hover:bg-slate-900/90 transition-all duration-300 hover:shadow-[0_0_40px_-10px_rgba(239,68,68,0.3)] hover:-translate-y-2 overflow-hidden">
                    <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-red-500/20 transition-colors duration-500" />
                    <div className="relative z-10 p-5 rounded-2xl bg-red-500/10 border border-red-500/20 group-hover:bg-red-500/20 transition-colors mb-6 shadow-inner">
                      <FileTextIcon className="w-12 h-12 sm:w-16 sm:h-16 text-red-500" />
                    </div>
                    <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">PDF</h3>
                    <p className="text-slate-400 font-medium mt-2 text-center">Portable Document Format</p>
-                 </div>
+                 </Link>
                  
                  {/* Format 2: DOCX */}
-                 <div className="group relative flex flex-col items-center p-8 sm:p-10 rounded-3xl bg-slate-950/80 border border-white/10 hover:border-blue-500/50 hover:bg-slate-900/90 transition-all duration-300 hover:shadow-[0_0_40px_-10px_rgba(59,130,246,0.3)] hover:-translate-y-2 overflow-hidden">
+                 <Link href="/convert" className="group relative flex flex-col items-center p-8 sm:p-10 rounded-3xl bg-slate-950/80 border border-white/10 hover:border-blue-500/50 hover:bg-slate-900/90 transition-all duration-300 hover:shadow-[0_0_40px_-10px_rgba(59,130,246,0.3)] hover:-translate-y-2 overflow-hidden">
                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-blue-500/20 transition-colors duration-500" />
                    <div className="relative z-10 p-5 rounded-2xl bg-blue-500/10 border border-blue-500/20 group-hover:bg-blue-500/20 transition-colors mb-6 shadow-inner">
                      <FileTextIcon className="w-12 h-12 sm:w-16 sm:h-16 text-blue-500" />
                    </div>
                    <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">DOCX</h3>
                    <p className="text-slate-400 font-medium mt-2 text-center">Microsoft Word Document</p>
-                 </div>
+                 </Link>
 
                  {/* Format 3: JPG/PNG */}
-                 <div className="group relative flex flex-col items-center p-8 sm:p-10 rounded-3xl bg-slate-950/80 border border-white/10 hover:border-emerald-500/50 hover:bg-slate-900/90 transition-all duration-300 hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.3)] hover:-translate-y-2 overflow-hidden">
+                 <Link href="/image" className="group relative flex flex-col items-center p-8 sm:p-10 rounded-3xl bg-slate-950/80 border border-white/10 hover:border-emerald-500/50 hover:bg-slate-900/90 transition-all duration-300 hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.3)] hover:-translate-y-2 overflow-hidden">
                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-emerald-500/20 transition-colors duration-500" />
                    <div className="relative z-10 p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 group-hover:bg-emerald-500/20 transition-colors mb-6 shadow-inner">
                      <ImagePlusIcon className="w-12 h-12 sm:w-16 sm:h-16 text-emerald-500" />
                    </div>
                    <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-baseline gap-2">JPG <span className="text-xl text-slate-500">/</span> PNG</h3>
                    <p className="text-slate-400 font-medium mt-2 text-center">Standard Image Formats</p>
-                 </div>
+                 </Link>
                  
               </div>
             </div>
           </div>
         </div>
 
-        {/* OUR TOOLS GRID */}
         <div id="tools" className="container mx-auto px-4 sm:px-6 max-w-7xl animate-in fade-in slide-in-from-bottom-12 duration-1000 fill-mode-both">
           <div className="text-center space-y-4 mb-12 sm:mb-16">
             <div className="inline-flex items-center space-x-2 bg-slate-800/50 rounded-full px-4 py-1.5 border border-white/5 mb-4 backdrop-blur-sm">
                <SparklesIcon className="w-4 h-4 text-orange-400" />
-               <span className="text-sm font-bold tracking-wider text-slate-300 uppercase">Feature rich</span>
+               <span className="text-sm font-bold tracking-wider text-slate-300 uppercase">Every Tool You Need</span>
             </div>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-white">🧰 Core Tools</h2>
-            <p className="text-slate-400 text-lg sm:text-xl font-medium max-w-2xl mx-auto px-4">Click on any tool below to instantly process your files securely.</p>
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-black dark:text-white text-slate-900">🧰 All PDF Tools</h2>
+            <p className="dark:text-slate-400 text-slate-600 text-lg sm:text-xl font-medium max-w-3xl mx-auto px-4">
+              Every tool you need to use PDFs, at your fingertips. All are fully offline, secure, and lightning fast. Merge, split, compress, convert, rotate, unlock and watermark PDFs with just a few clicks.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
             
-            <ToolCard 
-              href="/pdf/split-merge" 
-              title="Merge PDF"
-              desc="Combine multiple PDFs and images into one unified document instantly."
-              icon={Grid2x2Icon}
-              color="orange"
-            />
+            <ToolCard href="/pdf/split-merge" title="Merge PDF" desc="Combine PDFs in the order you want." icon={Grid2x2Icon} color="orange" />
+            <ToolCard href="/pdf/split-merge" title="Split PDF" desc="Separate pages or extract a whole set." icon={FilePlusIcon} color="blue" />
+            <ToolCard href="/pdf/finishing" title="Compress PDF" desc="Reduce file size with maximal quality." icon={FileArchiveIcon} color="rose" />
             
-            <ToolCard 
-              href="/pdf/split-merge" 
-              title="Split PDF"
-              desc="Extract specific pages or separate one massive PDF into smaller files cleanly."
-              icon={FilePlusIcon}
-              color="blue"
-            />
-
-            <ToolCard 
-              href="/convert" 
-              title="Convert Files"
-              desc="PDF to Word, Image to PDF, or extract images instantly completely offline."
-              icon={ArrowLeftRightIcon}
-              color="cyan"
-            />
-
-            <ToolCard 
-              href="/image" 
-              title="Image Studio"
-              desc="Resize, compress, and encode formats without losing quality."
-              icon={ImageIcon}
-              color="emerald"
-            />
-
-            <ToolCard 
-              href="/pdf/finishing" 
-              title="Compress PDF"
-              desc="Dramatically reduce PDF file sizes while keeping legibility."
-              icon={FileArchiveIcon}
-              color="rose"
-            />
-
-            <ToolCard 
-              href="/pdf/security" 
-              title="Protect & Redact"
-              desc="Add secure passwords and lock edits to keep files private."
-              icon={ShieldCheckIcon}
-              color="purple"
-            />
+            <ToolCard href="/convert" title="PDF to Word" desc="Convert PDF files into easy to edit DOCX." icon={FileTextIcon} color="cyan" />
+            <ToolCard href="/convert" title="PDF to PowerPoint" desc="Turn PDF into PPTX slideshows." icon={PresentationIcon} color="cyan" />
+            <ToolCard href="/convert" title="PDF to Excel" desc="Pull data straight into spreadsheets." icon={DatabaseIcon} color="cyan" />
+            
+            <ToolCard href="/convert" title="Word to PDF" desc="Convert DOCX files into PDF." icon={FileTextIcon} color="emerald" />
+            <ToolCard href="/convert" title="PowerPoint to PDF" desc="Convert PPTX slideshows to PDF." icon={PresentationIcon} color="emerald" />
+            <ToolCard href="/convert" title="Excel to PDF" desc="Convert EXCEL spreadsheets to PDF." icon={DatabaseIcon} color="emerald" />
+            
+            <ToolCard href="/pdf/edit" title="Edit PDF" desc="Add text, images, shapes or freehand." icon={EditIcon} color="purple" />
+            <ToolCard href="/convert" title="PDF to JPG" desc="Convert PDF to JPG exactly." icon={ImagesIcon} color="rose" />
+            <ToolCard href="/convert" title="JPG to PDF" desc="Convert JPG images to PDF." icon={ImagePlusIcon} color="emerald" />
+            <ToolCard href="/pdf/finishing" title="Sign PDF" desc="Sign yourself electronically." icon={PenToolIcon} color="orange" />
+            <ToolCard href="/pdf/finishing" title="Watermark" desc="Stamp an image or text over PDF." icon={LayersIcon} color="blue" />
+            <ToolCard href="/pdf/organize" title="Rotate PDF" desc="Rotate your PDFs exactly as needed." icon={RotateCwIcon} color="cyan" />
+            <ToolCard href="/pdf/html" title="HTML to PDF" desc="Convert webpages directly to PDF." icon={GlobeIcon} color="emerald" />
+            
+            <ToolCard href="/pdf/security" title="Unlock PDF" desc="Remove PDF password security." icon={UnlockIcon} color="purple" />
+            <ToolCard href="/pdf/security" title="Protect PDF" desc="Encrypt and protect PDF with password." icon={LockIcon} color="purple" />
+            <ToolCard href="/pdf/organize" title="Organize PDF" desc="Sort, delete, or add pages." icon={LayoutGridIcon} color="rose" />
+            
+            <ToolCard href="/pdf/pdfa" title="PDF to PDF/A" desc="Transform for long-term archiving." icon={SettingsIcon} color="orange" />
+            <ToolCard href="/pdf/repair" title="Repair PDF" desc="Repair a damaged PDF quickly." icon={WrenchIcon} color="blue" />
+            <ToolCard href="/pdf/finishing" title="Page Numbers" desc="Add page numbers with ease." icon={ListOrderedIcon} color="cyan" />
+            
+            <ToolCard href="/pdf/scan" title="Scan to PDF" desc="Capture scans using your camera." icon={ScanIcon} color="emerald" />
+            <ToolCard href="/pdf/intelligence" title="OCR PDF" desc="Convert scanned text into searchable content." icon={SearchIcon} color="purple" />
+            <ToolCard href="/pdf/compare" title="Compare PDF" desc="Side-by-side document comparison." icon={ArrowLeftRightIcon} color="rose" />
+            
+            <ToolCard href="/pdf/intelligence" title="Redact PDF" desc="Permanently remove sensitive info." icon={EyeOffIcon} color="orange" />
+            <ToolCard href="/pdf/crop" title="Crop PDF" desc="Crop margins of PDF documents." icon={CropIcon} color="blue" />
+            
+            <ToolCard href="/pdf/intelligence" title="AI Summarizer" desc="Quickly generate clear summaries." icon={CpuIcon} color="cyanBadge" />
+            <ToolCard href="/pdf/intelligence" title="Translate PDF" desc="Translate files perfectly intact." icon={GlobeIcon} color="emeraldBadge" />
 
           </div>
         </div>
@@ -208,8 +203,11 @@ export default function Home() {
   );
 }
 
-// ToolCard Component for cleaner grid layout
 function ToolCard({ href, title, desc, icon: Icon, color }: { href: string, title: string, desc: string, icon: LucideIcon, color: string }) {
+  // Check if it's a "New" feature denoted by the color badge
+  const isNew = color.includes("Badge");
+  const baseColor = color.replace("Badge", "");
+
   // Map colors to reliable Tailwind classes due to dynamic class limitations
   const colorMap: Record<string, string> = {
     orange: "text-orange-400 bg-orange-500/10 border-orange-500/20 group-hover:bg-orange-500/20 ring-orange-500/50 shadow-orange-500/20",
@@ -221,22 +219,27 @@ function ToolCard({ href, title, desc, icon: Icon, color }: { href: string, titl
   };
 
   // Safe fallback if color missing
-  const activeColor = colorMap[color] || colorMap.orange;
+  const activeColor = colorMap[baseColor] || colorMap.orange;
   const [textColor, bgColor, borderColor, hoverBgColor, ringColor, shadowColor] = activeColor.split(' ');
 
   return (
-    <Link href={href} className={`group block focus:outline-none focus:ring-4 ${ringColor} rounded-3xl`}>
-      <Card className={`h-full border border-white/5 bg-slate-900/60 backdrop-blur-2xl hover:bg-slate-800/80 transition-all duration-500 hover:shadow-[0_20px_40px_-15px_var(--tw-shadow-color)] ${shadowColor} hover:-translate-y-2 rounded-3xl overflow-hidden cursor-pointer relative`}>
-        <div className="absolute top-0 right-0 p-6 sm:p-8 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-4 group-hover:translate-x-0">
-          <ArrowRightIcon className={`${textColor} w-6 h-6 sm:w-8 sm:h-8`} />
-        </div>
-        <CardContent className="p-6 sm:p-8 md:p-10 flex flex-col items-start gap-4 sm:gap-6">
-          <div className={`p-4 sm:p-5 rounded-2xl ${bgColor} border ${borderColor} shadow-inner ${hoverBgColor} group-hover:scale-110 transition-all duration-500`}>
-            <Icon className={`h-8 w-8 sm:h-10 sm:w-10 ${textColor}`} />
+    <Link href={href} className={`group block focus:outline-none focus:ring-4 ${ringColor} rounded-3xl h-full`}>
+      <Card className={`h-full border border-white/5 dark:bg-slate-900/60 bg-white/60 backdrop-blur-2xl dark:hover:bg-slate-800/80 hover:bg-slate-50 transition-all duration-500 hover:shadow-xl ${shadowColor} hover:-translate-y-2 rounded-3xl overflow-hidden cursor-pointer relative`}>
+        {isNew && (
+          <div className="absolute top-3 right-3 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full z-10 animate-pulse">
+            NEW!
           </div>
-          <div className="space-y-2 sm:space-y-3">
-            <h3 className={`text-xl sm:text-2xl font-bold text-white group-hover:${textColor} transition-colors`}>{title}</h3>
-            <p className="text-slate-400 text-base sm:text-lg leading-relaxed">{desc}</p>
+        )}
+        <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-4 group-hover:translate-x-0">
+          <ArrowRightIcon className={`${textColor} w-5 h-5`} />
+        </div>
+        <CardContent className="p-4 sm:p-5 flex flex-col items-start gap-3 h-full">
+          <div className={`p-3 rounded-2xl ${bgColor} border ${borderColor} shadow-inner ${hoverBgColor} group-hover:scale-110 transition-transform duration-500 flex-shrink-0`}>
+            <Icon className={`h-6 w-6 sm:h-7 sm:w-7 ${textColor}`} />
+          </div>
+          <div className="space-y-1.5 flex-1 w-full">
+            <h3 className={`text-lg sm:text-xl font-bold dark:text-white text-slate-900 group-hover:${textColor} transition-colors tracking-tight leading-tight`}>{title}</h3>
+            <p className="dark:text-slate-400 text-slate-600 text-sm leading-snug line-clamp-3">{desc}</p>
           </div>
         </CardContent>
       </Card>
