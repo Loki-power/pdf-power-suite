@@ -23,19 +23,19 @@ export function Header() {
     {
       title: "CONVERT TO PDF",
       links: [
-        { href: "/convert", label: "JPG to PDF", icon: ImagePlusIcon },
-        { href: "/convert", label: "WORD to PDF", icon: FileTextIcon },
-        { href: "/convert", label: "EXCEL to PDF", icon: DatabaseIcon },
-        { href: "/convert", label: "PPT to PDF", icon: PresentationIcon },
+        { href: "/convert/jpg-to-pdf", label: "JPG to PDF", icon: ImagePlusIcon },
+        { href: "/convert/word-to-pdf", label: "WORD to PDF", icon: FileTextIcon },
+        { href: "/convert/excel-to-pdf", label: "EXCEL to PDF", icon: DatabaseIcon },
+        { href: "/convert/ppt-to-pdf", label: "PPT to PDF", icon: PresentationIcon },
       ]
     },
     {
       title: "CONVERT FROM PDF",
       links: [
-        { href: "/convert", label: "PDF to JPG", icon: ImagesIcon },
-        { href: "/convert", label: "PDF to WORD", icon: FileTextIcon },
-        { href: "/convert", label: "PDF to EXCEL", icon: DatabaseIcon },
-        { href: "/convert", label: "PDF to PPT", icon: PresentationIcon },
+        { href: "/convert/pdf-to-jpg", label: "PDF to JPG", icon: ImagesIcon },
+        { href: "/convert/pdf-to-word", label: "PDF to WORD", icon: FileTextIcon },
+        { href: "/convert/pdf-to-excel", label: "PDF to EXCEL", icon: DatabaseIcon },
+        { href: "/convert/pdf-to-ppt", label: "PDF to PPT", icon: PresentationIcon },
       ]
     },
     {
@@ -96,10 +96,10 @@ export function Header() {
                  <div className="flex-1">
                    <div className="text-xs text-slate-400 font-extrabold mb-3 tracking-wider uppercase">Convert to PDF</div>
                    <div className="flex flex-col gap-3">
-                      <Link href="/convert" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><ImagePlusIcon className="w-4 h-4 text-emerald-500"/> JPG to PDF</Link>
-                      <Link href="/convert" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><FileTextIcon className="w-4 h-4 text-blue-500"/> WORD to PDF</Link>
-                      <Link href="/convert" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><PresentationIcon className="w-4 h-4 text-orange-500"/> POWERPOINT to PDF</Link>
-                      <Link href="/convert" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><DatabaseIcon className="w-4 h-4 text-green-500"/> EXCEL to PDF</Link>
+                      <Link href="/convert/jpg-to-pdf" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><ImagePlusIcon className="w-4 h-4 text-emerald-500"/> JPG to PDF</Link>
+                      <Link href="/convert/word-to-pdf" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><FileTextIcon className="w-4 h-4 text-blue-500"/> WORD to PDF</Link>
+                      <Link href="/convert/ppt-to-pdf" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><PresentationIcon className="w-4 h-4 text-orange-500"/> POWERPOINT to PDF</Link>
+                      <Link href="/convert/excel-to-pdf" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><DatabaseIcon className="w-4 h-4 text-green-500"/> EXCEL to PDF</Link>
                       <Link href="/pdf/html" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><GlobeIcon className="w-4 h-4 text-slate-500"/> HTML to PDF</Link>
                    </div>
                  </div>
@@ -107,10 +107,10 @@ export function Header() {
                  <div className="flex-1">
                    <div className="text-xs text-slate-400 font-extrabold mb-3 tracking-wider uppercase">Convert from PDF</div>
                    <div className="flex flex-col gap-3">
-                      <Link href="/convert" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><ImagesIcon className="w-4 h-4 text-rose-500"/> PDF to JPG</Link>
-                      <Link href="/convert" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><FileTextIcon className="w-4 h-4 text-cyan-500"/> PDF to WORD</Link>
-                      <Link href="/convert" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><PresentationIcon className="w-4 h-4 text-cyan-500"/> PDF to POWERPOINT</Link>
-                      <Link href="/convert" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><DatabaseIcon className="w-4 h-4 text-cyan-500"/> PDF to EXCEL</Link>
+                      <Link href="/convert/pdf-to-jpg" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><ImagesIcon className="w-4 h-4 text-rose-500"/> PDF to JPG</Link>
+                      <Link href="/convert/pdf-to-word" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><FileTextIcon className="w-4 h-4 text-cyan-500"/> PDF to WORD</Link>
+                      <Link href="/convert/pdf-to-ppt" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><PresentationIcon className="w-4 h-4 text-cyan-500"/> PDF to POWERPOINT</Link>
+                      <Link href="/convert/pdf-to-excel" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><DatabaseIcon className="w-4 h-4 text-cyan-500"/> PDF to EXCEL</Link>
                       <Link href="/pdf/pdfa" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><SettingsIcon className="w-4 h-4 text-orange-500"/> PDF to PDF/A</Link>
                    </div>
                  </div>
@@ -152,10 +152,10 @@ export function Header() {
                    <div>
                       <div className="text-xs text-slate-400 font-extrabold mb-4 tracking-wider uppercase">Convert to PDF</div>
                       <div className="flex flex-col gap-3.5">
-                         <Link href="/convert" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><ImagePlusIcon className="w-4 h-4 text-emerald-500"/> JPG to PDF</Link>
-                         <Link href="/convert" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><FileTextIcon className="w-4 h-4 text-blue-500"/> WORD to PDF</Link>
-                         <Link href="/convert" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><PresentationIcon className="w-4 h-4 text-orange-500"/> POWERPOINT to PDF</Link>
-                         <Link href="/convert" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><DatabaseIcon className="w-4 h-4 text-green-500"/> EXCEL to PDF</Link>
+                         <Link href="/convert/jpg-to-pdf" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><ImagePlusIcon className="w-4 h-4 text-emerald-500"/> JPG to PDF</Link>
+                         <Link href="/convert/word-to-pdf" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><FileTextIcon className="w-4 h-4 text-blue-500"/> WORD to PDF</Link>
+                         <Link href="/convert/ppt-to-pdf" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><PresentationIcon className="w-4 h-4 text-orange-500"/> POWERPOINT to PDF</Link>
+                         <Link href="/convert/excel-to-pdf" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><DatabaseIcon className="w-4 h-4 text-green-500"/> EXCEL to PDF</Link>
                          <Link href="/pdf/html" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><GlobeIcon className="w-4 h-4 text-emerald-500"/> HTML to PDF</Link>
                       </div>
                    </div>
@@ -164,10 +164,10 @@ export function Header() {
                    <div>
                       <div className="text-xs text-slate-400 font-extrabold mb-4 tracking-wider uppercase">Convert from PDF</div>
                       <div className="flex flex-col gap-3.5">
-                         <Link href="/convert" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><ImagesIcon className="w-4 h-4 text-rose-500"/> PDF to JPG</Link>
-                         <Link href="/convert" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><FileTextIcon className="w-4 h-4 text-cyan-500"/> PDF to WORD</Link>
-                         <Link href="/convert" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><PresentationIcon className="w-4 h-4 text-cyan-500"/> PDF to POWERPOINT</Link>
-                         <Link href="/convert" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><DatabaseIcon className="w-4 h-4 text-cyan-500"/> PDF to EXCEL</Link>
+                         <Link href="/convert/pdf-to-jpg" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><ImagesIcon className="w-4 h-4 text-rose-500"/> PDF to JPG</Link>
+                         <Link href="/convert/pdf-to-word" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><FileTextIcon className="w-4 h-4 text-cyan-500"/> PDF to WORD</Link>
+                         <Link href="/convert/pdf-to-ppt" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><PresentationIcon className="w-4 h-4 text-cyan-500"/> PDF to POWERPOINT</Link>
+                         <Link href="/convert/pdf-to-excel" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><DatabaseIcon className="w-4 h-4 text-cyan-500"/> PDF to EXCEL</Link>
                          <Link href="/pdf/pdfa" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><SettingsIcon className="w-4 h-4 text-orange-500"/> PDF to PDF/A</Link>
                       </div>
                    </div>

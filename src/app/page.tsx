@@ -61,7 +61,7 @@ export default function Home() {
                 </div>
               </Button>
             </Link>
-            <Link href="/convert" className="w-full sm:w-auto">
+            <Link href="/convert/pdf-to-word" className="w-full sm:w-auto">
               <Button size="lg" variant="outline" className="w-full sm:w-auto h-16 sm:h-20 px-8 sm:px-14 text-lg sm:text-2xl font-extrabold rounded-2xl sm:rounded-full border-2 border-slate-700 hover:bg-slate-800 text-white shadow-lg transition-all hover:-translate-y-1 group bg-slate-900/80 backdrop-blur-md relative overflow-hidden">
                 <span className="absolute inset-0 bg-white/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
                 <div className="flex items-center justify-center relative z-10">
@@ -98,7 +98,7 @@ export default function Home() {
                  </Link>
                  
                  {/* Format 2: DOCX */}
-                 <Link href="/convert" className="group relative flex flex-col items-center p-8 sm:p-10 rounded-3xl bg-slate-950/80 border border-white/10 hover:border-blue-500/50 hover:bg-slate-900/90 transition-all duration-300 hover:shadow-[0_0_40px_-10px_rgba(59,130,246,0.3)] hover:-translate-y-2 overflow-hidden">
+                 <Link href="/convert/pdf-to-word" className="group relative flex flex-col items-center p-8 sm:p-10 rounded-3xl bg-slate-950/80 border border-white/10 hover:border-blue-500/50 hover:bg-slate-900/90 transition-all duration-300 hover:shadow-[0_0_40px_-10px_rgba(59,130,246,0.3)] hover:-translate-y-2 overflow-hidden">
                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-blue-500/20 transition-colors duration-500" />
                    <div className="relative z-10 p-5 rounded-2xl bg-blue-500/10 border border-blue-500/20 group-hover:bg-blue-500/20 transition-colors mb-6 shadow-inner">
                      <FileTextIcon className="w-12 h-12 sm:w-16 sm:h-16 text-blue-500" />
@@ -108,7 +108,7 @@ export default function Home() {
                  </Link>
 
                  {/* Format 3: JPG/PNG */}
-                 <Link href="/image" className="group relative flex flex-col items-center p-8 sm:p-10 rounded-3xl bg-slate-950/80 border border-white/10 hover:border-emerald-500/50 hover:bg-slate-900/90 transition-all duration-300 hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.3)] hover:-translate-y-2 overflow-hidden">
+                 <Link href="/convert/pdf-to-jpg" className="group relative flex flex-col items-center p-8 sm:p-10 rounded-3xl bg-slate-950/80 border border-white/10 hover:border-emerald-500/50 hover:bg-slate-900/90 transition-all duration-300 hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.3)] hover:-translate-y-2 overflow-hidden">
                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-emerald-500/20 transition-colors duration-500" />
                    <div className="relative z-10 p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 group-hover:bg-emerald-500/20 transition-colors mb-6 shadow-inner">
                      <ImagePlusIcon className="w-12 h-12 sm:w-16 sm:h-16 text-emerald-500" />
@@ -140,17 +140,17 @@ export default function Home() {
             <ToolCard href="/pdf/split" title="Split PDF" desc="Separate pages or extract a whole set." icon={FilePlusIcon} color="blue" />
             <ToolCard href="/pdf/compress" title="Compress PDF" desc="Reduce file size with maximal quality." icon={FileArchiveIcon} color="rose" />
             
-            <ToolCard href="/convert" title="PDF to Word" desc="Convert PDF files into easy to edit DOCX." icon={FileTextIcon} color="cyan" />
-            <ToolCard href="/convert" title="PDF to PowerPoint" desc="Turn PDF into PPTX slideshows." icon={PresentationIcon} color="cyan" />
-            <ToolCard href="/convert" title="PDF to Excel" desc="Pull data straight into spreadsheets." icon={DatabaseIcon} color="cyan" />
+            <ToolCard href="/convert/pdf-to-word" title="PDF to Word" desc="Convert PDF files into easy to edit DOCX." icon={FileTextIcon} color="cyan" />
+            <ToolCard href="/convert/pdf-to-ppt" title="PDF to PowerPoint" desc="Turn PDF into PPTX slideshows." icon={PresentationIcon} color="cyan" />
+            <ToolCard href="/convert/pdf-to-excel" title="PDF to Excel" desc="Pull data straight into spreadsheets." icon={DatabaseIcon} color="cyan" />
             
-            <ToolCard href="/convert" title="Word to PDF" desc="Convert DOCX files into PDF." icon={FileTextIcon} color="emerald" />
-            <ToolCard href="/convert" title="PowerPoint to PDF" desc="Convert PPTX slideshows to PDF." icon={PresentationIcon} color="emerald" />
-            <ToolCard href="/convert" title="Excel to PDF" desc="Convert EXCEL spreadsheets to PDF." icon={DatabaseIcon} color="emerald" />
+            <ToolCard href="/convert/word-to-pdf" title="Word to PDF" desc="Convert DOCX files into PDF." icon={FileTextIcon} color="emerald" />
+            <ToolCard href="/convert/ppt-to-pdf" title="PowerPoint to PDF" desc="Convert PPTX slideshows to PDF." icon={PresentationIcon} color="emerald" />
+            <ToolCard href="/convert/excel-to-pdf" title="Excel to PDF" desc="Convert EXCEL spreadsheets to PDF." icon={DatabaseIcon} color="emerald" />
             
             <ToolCard href="/pdf/edit" title="Edit PDF" desc="Add text, images, shapes or freehand." icon={EditIcon} color="purple" />
-            <ToolCard href="/convert" title="PDF to JPG" desc="Convert PDF to JPG exactly." icon={ImagesIcon} color="rose" />
-            <ToolCard href="/convert" title="JPG to PDF" desc="Convert JPG images to PDF." icon={ImagePlusIcon} color="emerald" />
+            <ToolCard href="/convert/pdf-to-jpg" title="PDF to JPG" desc="Convert PDF to JPG exactly." icon={ImagesIcon} color="rose" />
+            <ToolCard href="/convert/jpg-to-pdf" title="JPG to PDF" desc="Convert JPG images to PDF." icon={ImagePlusIcon} color="emerald" />
             <ToolCard href="/pdf/sign" title="Sign PDF" desc="Sign yourself electronically." icon={PenToolIcon} color="orange" />
             <ToolCard href="/pdf/watermark" title="Watermark" desc="Stamp an image or text over PDF." icon={LayersIcon} color="blue" />
             <ToolCard href="/pdf/rotate" title="Rotate PDF" desc="Rotate your PDFs exactly as needed." icon={RotateCwIcon} color="cyan" />

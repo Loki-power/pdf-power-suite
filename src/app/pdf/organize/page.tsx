@@ -133,7 +133,7 @@ export default function OrganizePages() {
         setFileBytes(bytes);
 
         // Render thumbnails using PDF.js
-        const loadingTask = pdfjsLib.getDocument({ data: bytes });
+        const loadingTask = pdfjsLib.getDocument({ data: bytes.slice() });
         const pdf = await loadingTask.promise;
         const totalPages = pdf.numPages;
         

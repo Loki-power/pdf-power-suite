@@ -44,7 +44,7 @@ export default function RotatePages() {
         const bytes = new Uint8Array(arrayBuffer);
         setFileBytes(bytes);
 
-        const loadingTask = pdfjsLib.getDocument({ data: bytes });
+        const loadingTask = pdfjsLib.getDocument({ data: bytes.slice() });
         const pdf = await loadingTask.promise;
         const totalPages = pdf.numPages;
         
