@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { MenuIcon, XIcon, ShieldCheckIcon, LockKeyholeIcon, CpuIcon, ChevronDownIcon, Grid2x2Icon, FilePlusIcon, LayoutGridIcon, ScanIcon, FileArchiveIcon, WrenchIcon, ImagePlusIcon, FileTextIcon, PresentationIcon, DatabaseIcon, GlobeIcon, ImagesIcon, SettingsIcon, RotateCwIcon, ListOrderedIcon, LayersIcon, CropIcon, EditIcon, UnlockIcon, LockIcon, PenToolIcon, EyeOffIcon, ArrowLeftRightIcon } from "lucide-react";
 import { useState } from "react";
-import { ThemeToggle } from "./ThemeToggle";
+
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,7 +14,7 @@ export function Header() {
   const mobileLinks = [
     { href: "/pdf/split-merge", label: "MERGE PDF" },
     { href: "/pdf/split-merge", label: "SPLIT PDF" },
-    { href: "/pdf/finishing", label: "COMPRESS PDF" },
+    { href: "/pdf/compress", label: "COMPRESS PDF" },
     { href: "/convert", label: "CONVERT PDF" },
     { href: "/pdf/organize", label: "ALL PDF TOOLS" },
   ];
@@ -34,7 +34,7 @@ export function Header() {
         </div>
       </div>
 
-      <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-slate-950/80 backdrop-blur-xl transition-all">
+      <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/90 shadow-sm backdrop-blur-xl transition-all">
         <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
           
           {/* Brand Logo */}
@@ -42,8 +42,8 @@ export function Header() {
             <div className="relative flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-orange-500 to-rose-600 shadow-lg shadow-orange-500/20 transition-transform group-hover:scale-105">
               <CpuIcon className="w-5 h-5 text-white" />
             </div>
-            <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white drop-shadow-sm">
-              Docu<span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-rose-400">Pro</span>
+            <span className="font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 drop-shadow-sm">
+              Docu<span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-rose-600">Pro</span>
             </span>
           </Link>
 
@@ -51,7 +51,7 @@ export function Header() {
           <nav className="hidden lg:flex items-center space-x-2 flex-1 justify-center px-4 font-bold text-sm tracking-wide h-full">
             <Link href="/pdf/split-merge" className="px-3 py-6 text-slate-700 dark:text-slate-300 hover:text-orange-500 transition-colors">MERGE PDF</Link>
             <Link href="/pdf/split-merge" className="px-3 py-6 text-slate-700 dark:text-slate-300 hover:text-orange-500 transition-colors">SPLIT PDF</Link>
-            <Link href="/pdf/finishing" className="px-3 py-6 text-slate-700 dark:text-slate-300 hover:text-orange-500 transition-colors">COMPRESS PDF</Link>
+            <Link href="/pdf/compress" className="px-3 py-6 text-slate-700 dark:text-slate-300 hover:text-orange-500 transition-colors">COMPRESS PDF</Link>
 
             {/* CONVERT PDF Dropdown */}
             <div className="relative group px-3 py-6 cursor-pointer">
@@ -112,7 +112,7 @@ export function Header() {
                      <div>
                        <div className="text-xs text-slate-400 font-extrabold mb-4 tracking-wider uppercase">Optimize PDF</div>
                        <div className="flex flex-col gap-3.5">
-                          <Link href="/pdf/finishing" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><FileArchiveIcon className="w-4 h-4 text-rose-500"/> Compress PDF</Link>
+                          <Link href="/pdf/compress" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><FileArchiveIcon className="w-4 h-4 text-rose-500"/> Compress PDF</Link>
                           <Link href="/pdf/repair" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><WrenchIcon className="w-4 h-4 text-blue-500"/> Repair PDF</Link>
                        </div>
                      </div>
@@ -148,22 +148,23 @@ export function Header() {
                        <div className="text-xs text-slate-400 font-extrabold mb-4 tracking-wider uppercase">Edit PDF</div>
                        <div className="flex flex-col gap-3.5">
                           <Link href="/pdf/organize" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><RotateCwIcon className="w-4 h-4 text-cyan-500"/> Rotate PDF</Link>
-                          <Link href="/pdf/finishing" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><ListOrderedIcon className="w-4 h-4 text-cyan-500"/> Add page numbers</Link>
-                          <Link href="/pdf/finishing" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><LayersIcon className="w-4 h-4 text-blue-500"/> Add watermark</Link>
+                          <Link href="/pdf/page-numbers" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><ListOrderedIcon className="w-4 h-4 text-cyan-500"/> Add page numbers</Link>
+                          <Link href="/pdf/watermark" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><LayersIcon className="w-4 h-4 text-blue-500"/> Add watermark</Link>
                           <Link href="/pdf/crop" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><CropIcon className="w-4 h-4 text-blue-500"/> Crop PDF</Link>
                           <Link href="/pdf/edit" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><EditIcon className="w-4 h-4 text-purple-500"/> Edit PDF</Link>
                        </div>
                      </div>
                      <div>
-                       <div className="text-xs text-slate-400 font-extrabold mb-4 tracking-wider uppercase">PDF Security</div>
-                       <div className="flex flex-col gap-3.5">
-                          <Link href="/pdf/security" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><UnlockIcon className="w-4 h-4 text-purple-500"/> Unlock PDF</Link>
-                          <Link href="/pdf/security" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><LockIcon className="w-4 h-4 text-purple-500"/> Protect PDF</Link>
-                          <Link href="/pdf/finishing" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><PenToolIcon className="w-4 h-4 text-orange-500"/> Sign PDF</Link>
-                          <Link href="/pdf/intelligence" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><EyeOffIcon className="w-4 h-4 text-orange-500"/> Redact PDF</Link>
-                          <Link href="/pdf/compare" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><ArrowLeftRightIcon className="w-4 h-4 text-rose-500"/> Compare PDF</Link>
-                       </div>
-                     </div>
+                     <div>
+             <div className="text-xs text-slate-400 font-extrabold mb-4 tracking-wider uppercase">PDF Security</div>
+             <div className="flex flex-col gap-3.5">
+                <Link href="/pdf/security" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><UnlockIcon className="w-4 h-4 text-purple-500"/> Unlock PDF</Link>
+                <Link href="/pdf/security" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><LockIcon className="w-4 h-4 text-purple-500"/> Protect PDF</Link>
+                <Link href="/pdf/sign" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><PenToolIcon className="w-4 h-4 text-orange-500"/> Sign PDF</Link>
+                <Link href="/pdf/intelligence" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><EyeOffIcon className="w-4 h-4 text-orange-500"/> Redact PDF</Link>
+                <Link href="/pdf/compare" className="text-sm text-slate-600 dark:text-slate-300 hover:text-orange-500 flex items-center gap-2"><ArrowLeftRightIcon className="w-4 h-4 text-rose-500"/> Compare PDF</Link>
+             </div>
+           </div>          </div>
                    </div>
 
                  </div>
@@ -173,7 +174,6 @@ export function Header() {
 
           {/* User Actions / CTA */}
           <div className="hidden lg:flex items-center gap-3">
-            <ThemeToggle />
             <Link href="/pdf/organize">
                <Button className="bg-gradient-to-r from-orange-500 to-rose-600 hover:from-orange-400 hover:to-rose-500 text-white border-0 shadow-lg shadow-orange-500/20 rounded-full px-6 font-bold transition-transform hover:scale-105">
                   Get Started
@@ -183,9 +183,8 @@ export function Header() {
 
           {/* Mobile Menu Toggle */}
           <div className="lg:hidden flex items-center gap-2">
-            <ThemeToggle />
             <button 
-            className="lg:hidden p-2 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+            className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500/50"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >

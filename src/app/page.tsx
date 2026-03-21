@@ -138,7 +138,7 @@ export default function Home() {
             
             <ToolCard href="/pdf/split-merge" title="Merge PDF" desc="Combine PDFs in the order you want." icon={Grid2x2Icon} color="orange" />
             <ToolCard href="/pdf/split-merge" title="Split PDF" desc="Separate pages or extract a whole set." icon={FilePlusIcon} color="blue" />
-            <ToolCard href="/pdf/finishing" title="Compress PDF" desc="Reduce file size with maximal quality." icon={FileArchiveIcon} color="rose" />
+            <ToolCard href="/pdf/compress" title="Compress PDF" desc="Reduce file size with maximal quality." icon={FileArchiveIcon} color="rose" />
             
             <ToolCard href="/convert" title="PDF to Word" desc="Convert PDF files into easy to edit DOCX." icon={FileTextIcon} color="cyan" />
             <ToolCard href="/convert" title="PDF to PowerPoint" desc="Turn PDF into PPTX slideshows." icon={PresentationIcon} color="cyan" />
@@ -151,8 +151,8 @@ export default function Home() {
             <ToolCard href="/pdf/edit" title="Edit PDF" desc="Add text, images, shapes or freehand." icon={EditIcon} color="purple" />
             <ToolCard href="/convert" title="PDF to JPG" desc="Convert PDF to JPG exactly." icon={ImagesIcon} color="rose" />
             <ToolCard href="/convert" title="JPG to PDF" desc="Convert JPG images to PDF." icon={ImagePlusIcon} color="emerald" />
-            <ToolCard href="/pdf/finishing" title="Sign PDF" desc="Sign yourself electronically." icon={PenToolIcon} color="orange" />
-            <ToolCard href="/pdf/finishing" title="Watermark" desc="Stamp an image or text over PDF." icon={LayersIcon} color="blue" />
+            <ToolCard href="/pdf/sign" title="Sign PDF" desc="Sign yourself electronically." icon={PenToolIcon} color="orange" />
+            <ToolCard href="/pdf/watermark" title="Watermark" desc="Stamp an image or text over PDF." icon={LayersIcon} color="blue" />
             <ToolCard href="/pdf/organize" title="Rotate PDF" desc="Rotate your PDFs exactly as needed." icon={RotateCwIcon} color="cyan" />
             <ToolCard href="/pdf/html" title="HTML to PDF" desc="Convert webpages directly to PDF." icon={GlobeIcon} color="emerald" />
             
@@ -162,7 +162,7 @@ export default function Home() {
             
             <ToolCard href="/pdf/pdfa" title="PDF to PDF/A" desc="Transform for long-term archiving." icon={SettingsIcon} color="orange" />
             <ToolCard href="/pdf/repair" title="Repair PDF" desc="Repair a damaged PDF quickly." icon={WrenchIcon} color="blue" />
-            <ToolCard href="/pdf/finishing" title="Page Numbers" desc="Add page numbers with ease." icon={ListOrderedIcon} color="cyan" />
+            <ToolCard href="/pdf/page-numbers" title="Page Numbers" desc="Add page numbers with ease." icon={ListOrderedIcon} color="cyan" />
             
             <ToolCard href="/pdf/scan" title="Scan to PDF" desc="Capture scans using your camera." icon={ScanIcon} color="emerald" />
             <ToolCard href="/pdf/intelligence" title="OCR PDF" desc="Convert scanned text into searchable content." icon={SearchIcon} color="purple" />
