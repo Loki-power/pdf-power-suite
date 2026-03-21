@@ -7,6 +7,7 @@ import {
   closestCenter,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   DragEndEvent
@@ -65,7 +66,7 @@ function SortablePage({
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="relative group touch-none">
+    <div ref={setNodeRef} style={style} className="relative group">
       <Card className={`overflow-hidden border-2 transition-all ${isDragging ? 'border-primary ring-4 ring-primary/20' : 'border-border/50 hover:border-primary/50'}`}>
         <CardContent className="p-2 relative bg-muted/20">
           <div className="absolute top-2 left-2 bg-background/80 backdrop-blur rounded-md px-2 py-1 text-xs font-bold border shadow-sm z-10">
@@ -73,7 +74,7 @@ function SortablePage({
           </div>
           
           <div 
-            className="absolute top-2 right-10 bg-blue-500/90 text-white p-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer shadow-sm z-10 hover:bg-blue-600"
+            className="absolute top-2 right-10 bg-blue-500/90 text-white p-1.5 rounded-md opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity cursor-pointer shadow-sm z-10 hover:bg-blue-600"
             onClick={(e) => { e.stopPropagation(); onRotate(page.id); }}
             title="Rotate 90°"
           >
@@ -81,14 +82,14 @@ function SortablePage({
           </div>
 
           <div 
-            className="absolute top-2 right-2 bg-destructive/90 text-destructive-foreground p-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer shadow-sm z-10 hover:bg-destructive"
+            className="absolute top-2 right-2 bg-destructive/90 text-destructive-foreground p-1.5 rounded-md opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity cursor-pointer shadow-sm z-10 hover:bg-destructive"
             onClick={(e) => { e.stopPropagation(); onDelete(page.id); }}
             title="Delete page"
           >
             <Trash2Icon className="h-4 w-4" />
           </div>
 
-          <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing w-full flex justify-center py-4 bg-background border rounded-md">
+          <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing w-full flex justify-center py-4 bg-background border rounded-md touch-none">
              {/* eslint-disable-next-line @next/next/no-img-element */}
             <img 
               src={page.thumbnailUrl} 
@@ -118,6 +119,7 @@ export default function OrganizePages() {
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 100, tolerance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
