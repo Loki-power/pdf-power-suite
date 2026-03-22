@@ -295,6 +295,27 @@ export default function Security() {
                           "Apply Security Settings"
                         )}
                       </Button>
+                      {processedUrl && (
+                        <div className="p-4 rounded-xl border border-green-500/20 bg-green-500/5 space-y-3">
+                          <div className="flex items-center space-x-2 text-green-500">
+                             <ShieldCheckIcon className="h-5 w-5" />
+                             <span className="font-bold">Protection Active</span>
+                          </div>
+                          <p className="text-sm text-muted-foreground italic">
+                            The document has been flattened (all text layers removed) and encrypted with dynamic permission locks. 
+                            Copying and printing are restricted at the file-structure level.
+                          </p>
+                          <Button 
+                            className="w-full bg-green-600 hover:bg-green-700 text-white" 
+                            onClick={() => {
+                              const a = document.createElement("a");
+                              a.href = processedUrl; a.download = "protected.pdf"; a.click();
+                            }}
+                          >
+                            <DownloadIcon className="mr-2 h-4 w-4" /> Download Secured PDF
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </TabsContent>
                   

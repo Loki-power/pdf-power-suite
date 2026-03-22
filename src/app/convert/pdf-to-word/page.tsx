@@ -12,7 +12,7 @@ export default function PdfToWord() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState<{ status: string; value: number } | null>(null);
   const [processedUrl, setProcessedUrl] = useState<string | null>(null);
-  const [highFidelity, setHighFidelity] = useState(false);
+  const [highFidelity, setHighFidelity] = useState(true);
   const [downloadName, setDownloadName] = useState("document.doc");
   const { addHistoryItem } = useHistory();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -69,7 +69,6 @@ export default function PdfToWord() {
             const blob = await new Promise<Blob>((resolve) => canvas.toBlob(b => resolve(b!), "image/png"));
             
             const { createWorker } = await import("tesseract.js");
-            // Use Hindi and English for best results as identified in user screenshots
             const worker = await createWorker("hin+eng", 1);
             const { data: { text } } = await worker.recognize(blob);
             
@@ -77,8 +76,14 @@ export default function PdfToWord() {
               if (line.trim()) {
                 pageParagraphs.push(
                   new Paragraph({
-                    children: [new TextRun({ text: line, size: 24 })],
-                    spacing: { before: 100 }
+                    children: [
+                      new TextRun({ 
+                        text: line, 
+                        size: 24, // 12pt
+                        font: "Mangal", // Standard Hindi font
+                      })
+                    ],
+                    spacing: { before: 120, line: 360 }, // Better line height for Hindi
                   })
                 );
               }
