@@ -12,6 +12,7 @@ export default function PdfToWord() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState<{ status: string; value: number } | null>(null);
   const [processedUrl, setProcessedUrl] = useState<string | null>(null);
+  const [highFidelity, setHighFidelity] = useState(false);
   const [downloadName, setDownloadName] = useState("document.doc");
   const { addHistoryItem } = useHistory();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -50,51 +51,88 @@ export default function PdfToWord() {
       for (let i = 1; i <= pdf.numPages; i++) {
         setProgress({ status: `Processing Page ${i}/${pdf.numPages}...`, value: 20 + Math.round((i/pdf.numPages) * 70) });
         const page = await pdf.getPage(i);
-        const textContent = await page.getTextContent();
-        const items = textContent.items as any[];
-        
-        // --- Layout-Aware Grouping ---
-        // 1. Group items by their Y-coordinate (transform[5])
-        const rows: { [key: number]: any[] } = {};
-        const threshold = 5; // Pixels to consider on the same line
-        
-        items.forEach(item => {
-          const y = Math.round(item.transform[5] / threshold) * threshold;
-          if (!rows[y]) rows[y] = [];
-          rows[y].push(item);
-        });
-        
-        // 2. Sort Y-coordinates from Top to Bottom (PDF Y is 0 at bottom usually)
-        const sortedY = Object.keys(rows).map(Number).sort((a, b) => b - a);
+        const viewport = page.getViewport({ scale: 2.0 });
         
         const pageParagraphs = [];
-        for (const y of sortedY) {
-          const rowItems = rows[y].sort((a, b) => a.transform[4] - b.transform[4]);
+        
+        if (highFidelity) {
+          // --- OCR BASED EXTRACTION ---
+          setProgress({ status: `Running OCR on Page ${i}/${pdf.numPages}...`, value: 20 + Math.round((i/pdf.numPages) * 70) });
           
-          let lineText = "";
-          let lastX = -1;
+          const canvas = document.createElement("canvas");
+          const context = canvas.getContext("2d");
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
           
-          rowItems.forEach(item => {
-            // Add a space if there's a significant gap between items
-            if (lastX !== -1 && (item.transform[4] - lastX) > (item.width || 5)) {
-              lineText += " ";
+          if (context) {
+            await page.render({ canvasContext: context as any, viewport: viewport }).promise;
+            const blob = await new Promise<Blob>((resolve) => canvas.toBlob(b => resolve(b!), "image/png"));
+            
+            const { createWorker } = await import("tesseract.js");
+            // Use Hindi and English for best results as identified in user screenshots
+            const worker = await createWorker("hin+eng", 1);
+            const { data: { text } } = await worker.recognize(blob);
+            
+            text.split('\n').forEach(line => {
+              if (line.trim()) {
+                pageParagraphs.push(
+                  new Paragraph({
+                    children: [new TextRun({ text: line, size: 24 })],
+                    spacing: { before: 100 }
+                  })
+                );
+              }
+            });
+            await worker.terminate();
+          }
+        } else {
+          // --- LAYOUT AWARE EXTRACTION ---
+          const textContent = await page.getTextContent();
+          const items = textContent.items as any[];
+          
+          // 1. Group items by their Y-coordinate
+          const rows: { [key: number]: any[] } = {};
+          items.forEach(item => {
+            const y = Math.round(item.transform[5]); 
+            let foundRowY = Object.keys(rows).map(Number).find(ry => Math.abs(ry - y) < 4);
+            if (foundRowY === undefined) {
+              rows[y] = [];
+              foundRowY = y;
             }
-            lineText += item.str;
-            lastX = item.transform[4] + (item.width || 0);
+            rows[foundRowY].push(item);
           });
           
-          if (lineText.trim()) {
-            pageParagraphs.push(
-              new Paragraph({
-                children: [
-                  new TextRun({
-                    text: lineText,
-                    size: 24, // 12pt
-                  }),
-                ],
-                spacing: { before: 100 }, // Brief space between lines
-              })
-            );
+          // 2. Sort Y-coordinates from Top to Bottom
+          const sortedY = Object.keys(rows).map(Number).sort((a, b) => b - a);
+          
+          for (const y of sortedY) {
+            const rowItems = rows[y].sort((a, b) => a.transform[4] - b.transform[4]);
+            
+            let lineText = "";
+            let lastX = -1;
+            let lastWidth = 0;
+            
+            rowItems.forEach(item => {
+              const currentX = item.transform[4];
+              if (lastX !== -1) {
+                const gap = currentX - (lastX + lastWidth);
+                if (gap > 2.0) { // Even tighter merging for Hindi
+                  lineText += " ";
+                }
+              }
+              lineText += item.str;
+              lastX = currentX;
+              lastWidth = item.width || 0;
+            });
+            
+            if (lineText.trim()) {
+              pageParagraphs.push(
+                new Paragraph({
+                  children: [new TextRun({ text: lineText, size: 24 })],
+                  spacing: { before: 100 }
+                })
+              );
+            }
           }
         }
         
@@ -157,17 +195,33 @@ export default function PdfToWord() {
 
               {!processedUrl ? (
                 <>
-                  {progress && (
-                    <div className="space-y-2 mb-6 p-4 rounded-xl border bg-muted/20">
-                      <div className="flex justify-between text-sm font-medium">
-                        <span>{progress.status}</span>
-                        <span>{progress.value}%</span>
+                    <div className="space-y-4 mb-6">
+                      <div className="flex items-center justify-between p-4 border rounded-xl bg-orange-500/5 border-orange-500/20">
+                        <div className="space-y-0.5">
+                          <label className="text-sm font-semibold">High Fidelity (Best for Hindi/OCR)</label>
+                          <p className="text-xs text-muted-foreground italic">Uses AI to perfectly reconstruct text from images. Slower but more accurate.</p>
+                        </div>
+                        {/* Use standard checkbox for simplicity */}
+                        <input 
+                          type="checkbox" 
+                          checked={highFidelity} 
+                          onChange={(e) => setHighFidelity(e.target.checked)}
+                          className="h-5 w-5 accent-cyan-500"
+                        />
                       </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-cyan-500 transition-all duration-300" style={{ width: `${progress.value}%` }} />
-                      </div>
+
+                      {progress && (
+                        <div className="space-y-2 p-4 rounded-xl border bg-muted/20">
+                          <div className="flex justify-between text-sm font-medium">
+                            <span>{progress.status}</span>
+                            <span>{progress.value}%</span>
+                          </div>
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-cyan-500 transition-all duration-300" style={{ width: `${progress.value}%` }} />
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  )}
                   <Button size="lg" className="w-full bg-cyan-600 hover:bg-cyan-700 text-white" onClick={processFile} disabled={isProcessing}>
                     {isProcessing && <Loader2 className="mr-2 h-5 w-5 animate-spin" />} Convert to Word
                   </Button>
