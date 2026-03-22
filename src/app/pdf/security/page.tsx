@@ -62,49 +62,72 @@ export default function Security() {
 
     try {
       setIsProcessing(true);
+      
+      // Dynamic imports for workers
+      // @ts-ignore
+      const pdfjsLib = await import('pdfjs-dist/build/pdf.min.mjs');
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+      
       const arrayBuffer = await file.arrayBuffer();
+      const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) });
+      const pdf = await loadingTask.promise;
       
-      // Load the PDF
-      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const { jsPDF } = await import("jspdf");
       
-      // Attempt to save with encryption options
-      // Note: standard pdf-lib might not fully support setting passwords without an add-on, 
-      // but we will pass the UserPassword and OwnerPassword options that the API sometimes accepts in specific builds.
-      const saveOptions: any = {};
+      // Initialize jsPDF with encryption if passwords or restrictions are set
+      // Note: jsPDF permissions are an array of allowed actions
+      const allowedPermissions = [];
+      if (!preventPrint) allowedPermissions.push("print");
+      if (!preventCopy) allowedPermissions.push("copy");
+      if (!preventModify) allowedPermissions.push("modify");
       
-      if (password) {
-        saveOptions.userPassword = password;
-        saveOptions.ownerPassword = password + "-owner"; // Owner pass required for permission limits
-      }
-      
-      // Apply permission flags if requested (Note: this relies heavily on viewer compliance)
-      if (preventPrint || preventCopy || preventModify) {
-        if (!saveOptions.ownerPassword) {
-            saveOptions.ownerPassword = "owner-lock-" + Date.now();
+      const doc = new jsPDF({
+        encryption: {
+          userPassword: password || undefined,
+          ownerPassword: (password || "owner") + "-protected",
+          userPermissions: allowedPermissions as any
         }
-        saveOptions.permissions = {
-            printing: preventPrint ? 'notAllowed' : 'highResolution',
-            modifying: preventModify ? false : true,
-            copying: preventCopy ? false : true,
-        };
+      });
+      
+      // Process each page
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({ scale: 2.0 }); // High resolution for quality
+        
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+        
+        if (context) {
+          await page.render({ canvasContext: context as any, viewport: viewport }).promise;
+          const imgData = canvas.toDataURL("image/jpeg", 0.75);
+          
+          if (i > 1) doc.addPage([viewport.width, viewport.height], viewport.width > viewport.height ? "l" : "p");
+          else {
+              // Adjust first page size
+              // @ts-ignore
+              doc.deletePage(1);
+              doc.addPage([viewport.width, viewport.height], viewport.width > viewport.height ? "l" : "p");
+          }
+          
+          // Use pt to mm conversion or just set internal size
+          const width = doc.internal.pageSize.getWidth();
+          const height = doc.internal.pageSize.getHeight();
+          doc.addImage(imgData, "JPEG", 0, 0, width, height);
+        }
       }
-
-      // Try saving. Note: If pdf-lib doesn't have AES enabled in this distribution, this might just save normally or throw.
-      const pdfBytes = await pdfDoc.save(Object.keys(saveOptions).length > 0 ? saveOptions : undefined);
-
-      const blob = new Blob([pdfBytes as any], { type: "application/pdf" });
+      
+      const pdfBytes = doc.output("arraybuffer");
+      const blob = new Blob([pdfBytes], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       
       setProcessedUrl(url);
-      addHistoryItem({ action: password ? "password protected" : "updated permissions", filename: file.name, module: "security" });
+      addHistoryItem({ action: password ? "password protected (FLATTENED)" : "updated permissions (FLATTENED)", filename: file.name, module: "security" });
       toast.success(password ? "PDF Secured successfully!" : "Permissions updated!");
     } catch (error: any) {
       console.error(error);
-      toast.error("Failed to secure PDF. This library version may not support AES encryption in the browser.");
-      
-      // Fallback: mock success for demo purposes if encryption throws
-      const fallbackUrl = URL.createObjectURL(file);
-      setProcessedUrl(fallbackUrl);
+      toast.error("Failed to secure PDF. Ensure the file is not corrupted.");
     } finally {
       setIsProcessing(false);
     }

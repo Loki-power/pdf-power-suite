@@ -28,8 +28,14 @@ export default function Intelligence() {
   const [fileBytes, setFileBytes] = useState<Uint8Array | null>(null);
   const { addHistoryItem } = useHistory();
   
+  // Shared UI states
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [processedUrl, setProcessedUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   // OCR State
   const [extractedText, setExtractedText] = useState<string>("");
+  const [selectedLanguage, setSelectedLanguage] = useState("eng");
   const [ocrProgress, setOcrProgress] = useState<{ status: string; progress: number } | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -37,11 +43,17 @@ export default function Intelligence() {
   const [redactEmails, setRedactEmails] = useState(true);
   const [redactPhones, setRedactPhones] = useState(false);
   const [customRegex, setCustomRegex] = useState("");
-  
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [processedUrl, setProcessedUrl] = useState<string | null>(null);
-  
-  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const languages = [
+    { label: "English", value: "eng" },
+    { label: "Hindi", value: "hin" },
+    { label: "Spanish", value: "spa" },
+    { label: "French", value: "fra" },
+    { label: "German", value: "deu" },
+    { label: "Chinese (Simp)", value: "chi_sim" },
+    { label: "Arabic", value: "ara" },
+    { label: "Japanese", value: "jpn" },
+  ];
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -69,9 +81,6 @@ export default function Intelligence() {
       
       let imageToOcr = file;
       
-      // If it's a PDF, we normally need to render it to a canvas first to OCR it.
-      // For simplicity in this browser port, if they upload a PDF, we'll alert them since Tesseract.js prefers direct images.
-      // Real implementation would use PDF.js to render page 1 to an image blob, then pass to Tesseract.
       if (file.type === "application/pdf") {
         try {
            // @ts-ignore
@@ -101,10 +110,10 @@ export default function Intelligence() {
         }
       }
 
-      const worker = await tesseract.createWorker("eng", 1, {
+      const worker = await tesseract.createWorker(selectedLanguage, 1, {
         logger: m => {
           if (m.status === "recognizing text") {
-            setOcrProgress({ status: "Scanning...", progress: Math.round(m.progress * 100) });
+            setOcrProgress({ status: `Scanning (${selectedLanguage})...`, progress: Math.round(m.progress * 100) });
           } else {
             setOcrProgress({ status: m.status, progress: 0 });
           }
@@ -114,13 +123,13 @@ export default function Intelligence() {
       const { data: { text } } = await worker.recognize(imageToOcr);
       
       setExtractedText(text);
-      addHistoryItem({ action: "Extracted Text (OCR)", filename: file.name, module: "intelligence" });
+      addHistoryItem({ action: `OCR (${selectedLanguage})`, filename: file.name, module: "intelligence" });
       toast.success("Text extracted successfully!");
       await worker.terminate();
       
     } catch (e: any) {
       console.error(e);
-      toast.error("Failed to run OCR on this file.");
+      toast.error(`Failed to run OCR (${selectedLanguage}) on this file.`);
     } finally {
       setIsProcessing(false);
       setOcrProgress(null);
@@ -255,6 +264,20 @@ export default function Intelligence() {
                            </div>
                         </div>
                       )}
+
+                      <div className="space-y-4">
+                        <Label htmlFor="ocr-lang">Recognition Language</Label>
+                        <select 
+                          id="ocr-lang" 
+                          value={selectedLanguage}
+                          onChange={(e) => setSelectedLanguage(e.target.value)}
+                          className="w-full p-2 rounded-md border bg-background"
+                        >
+                          {languages.map(lang => (
+                            <option key={lang.value} value={lang.value}>{lang.label}</option>
+                          ))}
+                        </select>
+                      </div>
 
                       <Button size="lg" className="w-full" onClick={processOCR} disabled={isProcessing}>
                         {isProcessing ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <ScanTextIcon className="mr-2 h-5 w-5" />}
