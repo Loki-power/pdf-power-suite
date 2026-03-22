@@ -32,8 +32,9 @@ export default function PdfToExcel() {
     
     try {
       setIsProcessing(true);
-      setProgress({ status: "Parsing PDF...", value: 15 });
+      setProgress({ status: "Loading Excel engine...", value: 5 });
       
+      const ExcelJS = await import("exceljs");
       // @ts-ignore
       const pdfjsLib = await import('pdfjs-dist/build/pdf.min.mjs');
       pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
@@ -43,32 +44,49 @@ export default function PdfToExcel() {
       const loadingTask = pdfjsLib.getDocument({ data: bytes.slice() });
       const pdf = await loadingTask.promise;
       
-      let extractedPages = [];
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Extracted Data');
+      
+      setProgress({ status: "Extracting data from PDF...", value: 20 });
+      
       for (let i = 1; i <= pdf.numPages; i++) {
-        setProgress({ status: `Extracting Text (Page ${i})...`, value: 15 + Math.round((i/pdf.numPages) * 70) });
+        setProgress({ status: `Processing Page ${i}/${pdf.numPages}...`, value: 20 + Math.round((i/pdf.numPages) * 70) });
         const page = await pdf.getPage(i);
         const textContent = await page.getTextContent();
-        extractedPages.push(textContent.items.map((item: any) => item.str).join(" "));
+        
+        // Group items by their vertical position (y-coordinate) to detect rows
+        const items = textContent.items as any[];
+        const rows: Record<number, string[]> = {};
+        
+        items.forEach(item => {
+          const y = Math.round(item.transform[5]);
+          if (!rows[y]) rows[y] = [];
+          rows[y].push(item.str);
+        });
+        
+        // Sort rows by y-coordinate (descending for top-to-bottom)
+        const sortedY = Object.keys(rows).map(Number).sort((a, b) => b - a);
+        
+        sortedY.forEach(y => {
+          worksheet.addRow(rows[y]);
+        });
+        
+        // Add a spacer row between pages
+        worksheet.addRow([]);
       }
       
-      setProgress({ status: `Formatting Excel Layout...`, value: 95 });
+      setProgress({ status: "Generating binary spreadsheet...", value: 95 });
       
-      const rows = extractedPages.map(text => `<tr><td>${text.replace(/,/g, ' ')}</td></tr>`).join('');
-      const excelHtml = `
-      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
-      <head><meta charset="utf-8"><title>Export</title></head>
-      <body><table>${rows || '<tr><td>No data found.</td></tr>'}</table></body>
-      </html>`;
-      
-      const blob = new Blob([excelHtml], { type: 'application/vnd.ms-excel' });
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       
       setProcessedUrl(URL.createObjectURL(blob));
-      setDownloadName(`${files[0].name.replace('.pdf', '')}.xls`);
-      addHistoryItem({ action: `Converted PDF to Excel`, filename: files[0].name, module: "convert" });
-      toast.success(`Excel document successfully processed and exported!`);
+      setDownloadName(`${files[0].name.replace('.pdf', '')}.xlsx`);
+      addHistoryItem({ action: `Converted PDF to Excel (.xlsx)`, filename: files[0].name, module: "convert" });
+      toast.success(`Binary Excel document (.xlsx) generated successfully!`);
     } catch (e: any) {
       console.error(e);
-      toast.error(`Failed to convert PDF to Excel.`);
+      toast.error(`Failed to convert PDF to Excel: ${e.message}`);
     } finally {
       setIsProcessing(false);
       setProgress(null);

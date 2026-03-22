@@ -32,8 +32,9 @@ export default function PdfToPpt() {
     
     try {
       setIsProcessing(true);
-      setProgress({ status: "Parsing PDF...", value: 15 });
+      setProgress({ status: "Loading PPT engine...", value: 5 });
       
+      const PptxGenJS = (await import("pptxgenjs")).default;
       // @ts-ignore
       const pdfjsLib = await import('pdfjs-dist/build/pdf.min.mjs');
       pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
@@ -43,26 +44,42 @@ export default function PdfToPpt() {
       const loadingTask = pdfjsLib.getDocument({ data: bytes.slice() });
       const pdf = await loadingTask.promise;
       
-      let extractedPages = [];
+      const pptx = new PptxGenJS();
+      pptx.layout = 'LAYOUT_16x9';
+      
+      setProgress({ status: "Extracting content and creating slides...", value: 20 });
+      
       for (let i = 1; i <= pdf.numPages; i++) {
-        setProgress({ status: `Extracting Text (Page ${i})...`, value: 15 + Math.round((i/pdf.numPages) * 70) });
+        setProgress({ status: `Creating Slide ${i}/${pdf.numPages}...`, value: 20 + Math.round((i/pdf.numPages) * 70) });
         const page = await pdf.getPage(i);
         const textContent = await page.getTextContent();
-        extractedPages.push(textContent.items.map((item: any) => item.str).join(" "));
+        const pageText = textContent.items.map((item: any) => item.str).join(" ");
+        
+        const slide = pptx.addSlide();
+        slide.addText(`Extracted from Page ${i}`, { x: 0.5, y: 0.3, fontSize: 18, color: '363636', bold: true });
+        slide.addText(pageText || 'No text content found on this page.', { 
+            x: 0.5, 
+            y: 1.0, 
+            w: 9.0, 
+            h: 4.0, 
+            fontSize: 12, 
+            color: '666666',
+            align: pptx.AlignH.left,
+            valign: pptx.AlignV.top
+        });
       }
       
-      setProgress({ status: `Formatting Presentation Layout...`, value: 95 });
+      setProgress({ status: "Generating binary presentation...", value: 95 });
       
-      const slides = extractedPages.map((text, i) => `Slide ${i+1}\n\n${text}`).join('\n\n---\n\n');
-      const blob = new Blob([slides || 'No text found.'], { type: 'text/plain' });
+      const blob = await pptx.write({ outputType: 'blob' }) as Blob;
       
       setProcessedUrl(URL.createObjectURL(blob));
-      setDownloadName(`${files[0].name.replace('.pdf', '')}.ppt`);
-      addHistoryItem({ action: `Converted PDF to PowerPoint`, filename: files[0].name, module: "convert" });
-      toast.success(`PowerPoint document successfully processed and exported!`);
+      setDownloadName(`${files[0].name.replace('.pdf', '')}.pptx`);
+      addHistoryItem({ action: `Converted PDF to PowerPoint (.pptx)`, filename: files[0].name, module: "convert" });
+      toast.success(`Binary PowerPoint presentation (.pptx) generated successfully!`);
     } catch (e: any) {
       console.error(e);
-      toast.error(`Failed to convert PDF to PowerPoint.`);
+      toast.error(`Failed to convert PDF to PowerPoint: ${e.message}`);
     } finally {
       setIsProcessing(false);
       setProgress(null);

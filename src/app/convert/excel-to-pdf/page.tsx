@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import JSZip from "jszip";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -30,62 +28,81 @@ export default function ExcelToPdf() {
     if (files.length === 0) return;
     try {
        setIsProcessing(true);
-       setProgress({ status: `Unzipping Excel structure...`, value: 20 });
+       setProgress({ status: `Loading Excel & PDF engines...`, value: 10 });
+       
+       const ExcelJS = await import("exceljs");
+       const { jsPDF } = await import("jspdf");
        
        const arrayBuffer = await files[0].arrayBuffer();
-       const zip = await JSZip.loadAsync(arrayBuffer);
+       const workbook = new ExcelJS.Workbook();
        
-       setProgress({ status: "Extracting strings...", value: 40 });
-       const sharedStringsFile = zip.file("xl/sharedStrings.xml");
+       setProgress({ status: "Reading spreadsheet data...", value: 30 });
+       await workbook.xlsx.load(arrayBuffer);
        
-       if (!sharedStringsFile) {
-         throw new Error("No shared strings found in Excel document. (Might be empty)");
+       const worksheet = workbook.getWorksheet(1); // Get first sheet
+       if (!worksheet) throw new Error("No worksheet found in Excel file.");
+
+       setProgress({ status: "Building PDF layout...", value: 60 });
+       
+       const doc = new jsPDF({
+         orientation: 'p',
+         unit: 'pt',
+         format: 'a4'
+       });
+
+       // Create a table in HTML to render via jsPDF
+       const table = document.createElement('table');
+       table.style.borderCollapse = 'collapse';
+       table.style.width = '100%';
+       table.style.fontSize = '10pt';
+       table.style.fontFamily = 'Helvetica';
+
+       worksheet.eachRow((row, rowNumber) => {
+         const tr = document.createElement('tr');
+         row.eachCell((cell, colNumber) => {
+           const td = document.createElement('td');
+           td.style.border = '1px solid #ccc';
+           td.style.padding = '4pt';
+           td.innerText = cell.text || '';
+           tr.appendChild(td);
+         });
+         table.appendChild(tr);
+       });
+
+       const container = document.createElement('div');
+       container.style.width = '550pt';
+       container.style.padding = '40pt';
+       container.style.backgroundColor = 'white';
+       container.appendChild(table);
+       document.body.appendChild(container);
+
+       try {
+         await doc.html(container, {
+           callback: function (doc) {
+             const pdfBytes = doc.output('arraybuffer');
+             const blob = new Blob([pdfBytes], { type: "application/pdf" });
+             setProcessedUrl(URL.createObjectURL(blob));
+             setDownloadName(`${files[0].name.split('.')[0]}.pdf`);
+             addHistoryItem({ action: `Converted Excel to PDF`, filename: files[0].name, module: "convert" });
+             toast.success(`Excel spreadsheet successfully converted to PDF.`);
+             document.body.removeChild(container);
+             setIsProcessing(false);
+             setProgress(null);
+           },
+           margin: [40, 40, 40, 40],
+           autoPaging: 'text',
+           x: 0,
+           y: 0,
+           width: 550,
+           windowWidth: 600
+         });
+       } catch (err) {
+         document.body.removeChild(container);
+         throw err;
        }
-       
-       const xmlContent = await sharedStringsFile.async("string");
-       
-       setProgress({ status: "Parsing text nodes...", value: 60 });
-       const textRegex = /<t>([^<]*)<\/t>/g;
-       let tMatch;
-       const strings: string[] = [];
-       while ((tMatch = textRegex.exec(xmlContent)) !== null) {
-           if (tMatch[1].trim()) strings.push(tMatch[1].replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>'));
-       }
-       
-       const pdfDoc = await PDFDocument.create();
-       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-       
-       setProgress({ status: "Exporting grid layout to PDF...", value: 80 });
-       
-       const fontSize = 10;
-       const lineHeight = 14;
-       let page = pdfDoc.addPage();
-       let { width, height } = page.getSize();
-       let yOffset = height - 50;
-       
-       page.drawText(`Extracted String Data from ${files[0].name}`, { x: 50, y: yOffset, size: 14, font, color: rgb(0,0.5,0) });
-       yOffset -= 30;
-       
-       for (const text of strings) {
-           page.drawText(text.substring(0, 100), { x: 50, y: yOffset, size: fontSize, font });
-           yOffset -= lineHeight;
-           if (yOffset < 50) {
-               page = pdfDoc.addPage();
-               yOffset = height - 50;
-           }
-       }
-       
-       const pdfBytes = await pdfDoc.save();
-       const blob = new Blob([pdfBytes as any], { type: "application/pdf" });
-       setProcessedUrl(URL.createObjectURL(blob));
-       setDownloadName(`${files[0].name.split('.')[0]}.pdf`);
-       
-       addHistoryItem({ action: `Converted Excel data back to PDF`, filename: files[0].name, module: "convert" });
-       toast.success(`Excel document data extracted and rendered to PDF.`);
     } catch (e: any) {
        console.error(e);
        toast.error(`Engine failed: ${e.message || "Unknown error"}`);
-    } finally {
        setIsProcessing(false);
        setProgress(null);
     }
@@ -142,12 +159,20 @@ export default function ExcelToPdf() {
                   </Button>
                 </>
               ) : (
-                 <Button size="lg" className="w-full bg-green-600 hover:bg-green-700 text-white" onClick={() => {
-                    const a = document.createElement("a");
-                    a.href = processedUrl; a.download = downloadName; a.click();
-                 }}>
-                   <DownloadIcon className="mr-2 h-5 w-5" /> Download PDF
-                 </Button>
+                 <div className="space-y-3">
+                   <Button size="lg" className="w-full bg-green-600 hover:bg-green-700 text-white" onClick={() => {
+                      const a = document.createElement("a");
+                      a.href = processedUrl; a.download = downloadName; a.click();
+                   }}>
+                     <DownloadIcon className="mr-2 h-5 w-5" /> Download PDF
+                   </Button>
+                   <Button variant="outline" className="w-full" onClick={() => { 
+                      setFiles([]); setProcessedUrl(null); 
+                      if (fileInputRef.current) fileInputRef.current.value = '';
+                   }}>
+                     Convert another file
+                   </Button>
+                 </div>
               )}
             </div>
           )}

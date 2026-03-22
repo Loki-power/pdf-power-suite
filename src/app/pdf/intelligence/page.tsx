@@ -339,10 +339,15 @@ export default function Intelligence() {
                           Your document has been processed with the requested visual redactions.
                         </p>
                       </div>
-                      <Button size="lg" className="w-full sm:w-auto px-8 py-6 text-lg" onClick={triggerDownload}>
-                        <DownloadIcon className="mr-2 h-6 w-6" />
-                        Download Redacted PDF
-                      </Button>
+                      <div className="flex flex-col sm:flex-row gap-3 w-full justify-center">
+                        <Button size="lg" className="w-full sm:w-auto px-8" onClick={triggerDownload}>
+                          <DownloadIcon className="mr-2 h-5 w-5" />
+                          Download Redacted PDF
+                        </Button>
+                        <Button variant="outline" size="lg" className="w-full sm:w-auto px-8" onClick={() => { setProcessedUrl(null); setFile(null); setFileBytes(null); }}>
+                          Redact another file
+                        </Button>
+                      </div>
                     </div>
                   )}
                 </TabsContent>

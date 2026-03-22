@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import JSZip from "jszip";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -30,61 +28,77 @@ export default function PptToPdf() {
     if (files.length === 0) return;
     try {
        setIsProcessing(true);
-       setProgress({ status: `Unzipping PowerPoint structure...`, value: 20 });
+       setProgress({ status: `Unzipping PowerPoint...`, value: 10 });
+       
+       const JSZip = (await import("jszip")).default;
+       const { jsPDF } = await import("jspdf");
        
        const arrayBuffer = await files[0].arrayBuffer();
        const zip = await JSZip.loadAsync(arrayBuffer);
        
-       setProgress({ status: "Extracting slides...", value: 40 });
+       setProgress({ status: "Extracting slides...", value: 30 });
        
-       // Find all slide XML files
-       const slideFiles: JSZip.JSZipObject[] = [];
+       const slideFiles: { name: string, file: any }[] = [];
        zip.folder("ppt/slides")?.forEach((relativePath, file) => {
            if (relativePath.startsWith("slide") && relativePath.endsWith(".xml")) {
-               slideFiles.push(file);
+               slideFiles.push({ name: relativePath, file });
            }
        });
        
-       if (slideFiles.length === 0) {
-           throw new Error("No slides found in this PowerPoint file.");
-       }
+        // Sort slides by number (slide1.xml, slide2.xml...)
+        slideFiles.sort((a, b) => {
+            const matchA = a.name.match(/\d+/);
+            const matchB = b.name.match(/\d+/);
+            const numA = matchA ? parseInt(matchA[0]) : 0;
+            const numB = matchB ? parseInt(matchB[0]) : 0;
+            return numA - numB;
+        });
+
+       if (slideFiles.length === 0) throw new Error("No slides found in this PowerPoint file.");
+
+       setProgress({ status: "Rendering PDF Slides...", value: 50 });
        
-       const pdfDoc = await PDFDocument.create();
-       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-       
-       setProgress({ status: "Rendering slides to PDF...", value: 60 });
-       
+       const doc = new jsPDF({
+         orientation: 'l',
+         unit: 'pt',
+         format: 'a4'
+       });
+
        for (let i = 0; i < slideFiles.length; i++) {
-           const slideXml = await slideFiles[i].async("string");
-           
-           // Extract text fragments
+           const slideXml = await slideFiles[i].file.async("string");
            const textRegex = /<a:t>([^<]*)<\/a:t>/g;
            let tMatch;
            const slideText: string[] = [];
            while ((tMatch = textRegex.exec(slideXml)) !== null) {
                if (tMatch[1].trim()) slideText.push(tMatch[1].replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>'));
            }
+
+           if (i > 0) doc.addPage();
            
-           const page = pdfDoc.addPage([1024, 768]); // Landscape 4:3
+           doc.setFontSize(20);
+           doc.setTextColor(100, 100, 100);
+           doc.text(`Slide ${i + 1}`, 40, 40);
            
-           page.drawText(`Slide ${i + 1}`, { x: 50, y: 720, size: 24, font, color: rgb(0.5, 0.5, 0.5) });
+           doc.setFontSize(12);
+           doc.setTextColor(0, 0, 0);
            
-           let yOffset = 600;
+           let yOffset = 80;
            for (const text of slideText) {
-               page.drawText(text.substring(0, 100) + (text.length > 100 ? "..." : ""), { 
-                   x: 100, y: yOffset, size: 20, font 
-               });
-               yOffset -= 30;
-               if (yOffset < 50) break; // Simple overflow prevention for the crude parser
+               const lines = doc.splitTextToSize(text, 750);
+               doc.text(lines, 60, yOffset);
+               yOffset += (lines.length * 15) + 10;
+               if (yOffset > 550) break; // Simple overflow
            }
+           
+           setProgress({ status: `Rendering Slide ${i+1}/${slideFiles.length}...`, value: 50 + Math.round(((i+1)/slideFiles.length) * 45) });
        }
        
-       const pdfBytes = await pdfDoc.save();
-       const blob = new Blob([pdfBytes as any], { type: "application/pdf" });
+       const pdfBytes = doc.output('arraybuffer');
+       const blob = new Blob([pdfBytes], { type: "application/pdf" });
        setProcessedUrl(URL.createObjectURL(blob));
        setDownloadName(`${files[0].name.split('.')[0]}.pdf`);
        
-       addHistoryItem({ action: `Converted ${slideFiles.length} PPT Slides to PDF`, filename: files[0].name, module: "convert" });
+       addHistoryItem({ action: `Converted ${slideFiles.length} Slides to PDF`, filename: files[0].name, module: "convert" });
        toast.success(`Presentation successfully converted to PDF.`);
     } catch (e: any) {
        console.error(e);
@@ -146,12 +160,20 @@ export default function PptToPdf() {
                   </Button>
                 </>
               ) : (
-                 <Button size="lg" className="w-full bg-green-600 hover:bg-green-700 text-white" onClick={() => {
-                    const a = document.createElement("a");
-                    a.href = processedUrl; a.download = downloadName; a.click();
-                 }}>
-                   <DownloadIcon className="mr-2 h-5 w-5" /> Download PDF
-                 </Button>
+                 <div className="space-y-3">
+                   <Button size="lg" className="w-full bg-green-600 hover:bg-green-700 text-white" onClick={() => {
+                      const a = document.createElement("a");
+                      a.href = processedUrl; a.download = downloadName; a.click();
+                   }}>
+                     <DownloadIcon className="mr-2 h-5 w-5" /> Download PDF
+                   </Button>
+                   <Button variant="outline" className="w-full" onClick={() => { 
+                      setFiles([]); setProcessedUrl(null); 
+                      if (fileInputRef.current) fileInputRef.current.value = '';
+                   }}>
+                     Convert another file
+                   </Button>
+                 </div>
               )}
             </div>
           )}

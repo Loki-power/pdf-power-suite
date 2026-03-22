@@ -128,12 +128,20 @@ export default function JpgToPdf() {
                   </Button>
                 </>
               ) : (
-                 <Button size="lg" className="w-full bg-green-600 hover:bg-green-700 text-white" onClick={() => {
-                    const a = document.createElement("a");
-                    a.href = processedUrl; a.download = downloadName; a.click();
-                 }}>
-                   <DownloadIcon className="mr-2 h-5 w-5" /> Download PDF
-                 </Button>
+                 <div className="space-y-3">
+                   <Button size="lg" className="w-full bg-green-600 hover:bg-green-700 text-white" onClick={() => {
+                      const a = document.createElement("a");
+                      a.href = processedUrl; a.download = downloadName; a.click();
+                   }}>
+                     <DownloadIcon className="mr-2 h-5 w-5" /> Download PDF
+                   </Button>
+                   <Button variant="outline" className="w-full" onClick={() => { 
+                      setFiles([]); setProcessedUrl(null); 
+                      if (fileInputRef.current) fileInputRef.current.value = '';
+                   }}>
+                     Convert another file
+                   </Button>
+                 </div>
               )}
             </div>
           )}

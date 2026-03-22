@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
-import JSZip from "jszip";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -30,90 +28,61 @@ export default function WordToPdf() {
     if (files.length === 0) return;
     try {
        setIsProcessing(true);
-       setProgress({ status: `Unzipping DOCX structure...`, value: 20 });
+       setProgress({ status: `Loading conversion engines...`, value: 10 });
+       
+       const mammoth = await import("mammoth");
+       const { jsPDF } = await import("jspdf");
        
        const arrayBuffer = await files[0].arrayBuffer();
-       const zip = await JSZip.loadAsync(arrayBuffer);
        
-       setProgress({ status: "Extracting document.xml...", value: 40 });
-       const docXmlFile = zip.file("word/document.xml");
-       if (!docXmlFile) {
-         throw new Error("Invalid Word Document structure.");
-       }
+       setProgress({ status: "Converting Word to HTML layout...", value: 40 });
+       const result = await mammoth.convertToHtml({ arrayBuffer });
+       const html = result.value; // The generated HTML
        
-       const xmlContent = await docXmlFile.async("string");
+       setProgress({ status: "Rendering PDF document...", value: 70 });
        
-       setProgress({ status: "Parsing text nodes...", value: 60 });
-       // Extract all <w:t> tags
-       const textRegex = /<w:t[^>]*>(.*?)<\/w:t>/g;
-       let match;
-       const paragraphs = [];
-       let currentParagraph = "";
-       
-       // A deeper dive would parse <w:p> tags to know when paragraphs end, but for a 100% offline client parser,
-       // we will split text loosely based on large spacing or element breaks.
-       const paragraphRegex = /<w:p[^>]*>.*?<\/w:p>/g;
-       let pMatch;
-       while ((pMatch = paragraphRegex.exec(xmlContent)) !== null) {
-          const pXml = pMatch[0];
-          let pText = "";
-          let tMatch;
-          while ((tMatch = textRegex.exec(pXml)) !== null) {
-             pText += tMatch[1];
-          }
-          if (pText) paragraphs.push(pText.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>'));
-       }
+       const doc = new jsPDF({
+         orientation: 'p',
+         unit: 'pt',
+         format: 'a4'
+       });
 
-       setProgress({ status: "Rendering PDF engine...", value: 80 });
-       
-       const pdfDoc = await PDFDocument.create();
-       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-       
-       const fontSize = 12;
-       const lineHeight = 16;
-       let page = pdfDoc.addPage();
-       let { width, height } = page.getSize();
-       let yOffset = height - 50;
-       
-       for (const text of paragraphs) {
-          // Word wrap logic
-          const words = text.split(' ');
-          let currentLine = '';
-          
-          for (let i = 0; i < words.length; i++) {
-             const testLine = currentLine + words[i] + ' ';
-             const textWidth = font.widthOfTextAtSize(testLine, fontSize);
-             if (textWidth > width - 100 && i > 0) {
-                 page.drawText(currentLine, { x: 50, y: yOffset, size: fontSize, font });
-                 currentLine = words[i] + ' ';
-                 yOffset -= lineHeight;
-                 if (yOffset < 50) {
-                     page = pdfDoc.addPage();
-                     yOffset = height - 50;
-                 }
-             } else {
-                 currentLine = testLine;
-             }
-          }
-          page.drawText(currentLine, { x: 50, y: yOffset, size: fontSize, font });
-          yOffset -= (lineHeight * 1.5); // Paragraph spacing
-          if (yOffset < 50) {
-              page = pdfDoc.addPage();
-              yOffset = height - 50;
-          }
+       // Mammoth generates clean HTML. We can use jsPDF's html method.
+       // Note: In a browser environment, this usually requires a hidden element or similar.
+       const container = document.createElement('div');
+       container.style.width = '550pt';
+       container.style.padding = '40pt';
+       container.style.backgroundColor = 'white';
+       container.innerHTML = html;
+       document.body.appendChild(container);
+
+       try {
+         await doc.html(container, {
+           callback: function (doc) {
+             const pdfBytes = doc.output('arraybuffer');
+             const blob = new Blob([pdfBytes], { type: "application/pdf" });
+             setProcessedUrl(URL.createObjectURL(blob));
+             setDownloadName(`${files[0].name.split('.')[0]}.pdf`);
+             addHistoryItem({ action: `Converted Word to PDF`, filename: files[0].name, module: "convert" });
+             toast.success(`Word document successfully converted to PDF.`);
+             document.body.removeChild(container);
+             setIsProcessing(false);
+             setProgress(null);
+           },
+           margin: [40, 40, 40, 40],
+           autoPaging: 'text',
+           x: 0,
+           y: 0,
+           width: 550,
+           windowWidth: 600
+         });
+       } catch (err) {
+         document.body.removeChild(container);
+         throw err;
        }
-       
-       const pdfBytes = await pdfDoc.save();
-       const blob = new Blob([pdfBytes as any], { type: "application/pdf" });
-       setProcessedUrl(URL.createObjectURL(blob));
-       setDownloadName(`${files[0].name.split('.')[0]}.pdf`);
-       
-       addHistoryItem({ action: `Converted Word to PDF`, filename: files[0].name, module: "convert" });
-       toast.success(`Word document perfectly extracted and rendered into PDF.`);
     } catch (e: any) {
        console.error(e);
        toast.error(`Engine failed: ${e.message || "Unknown error"}`);
-    } finally {
        setIsProcessing(false);
        setProgress(null);
     }
@@ -170,12 +139,20 @@ export default function WordToPdf() {
                   </Button>
                 </>
               ) : (
-                 <Button size="lg" className="w-full bg-green-600 hover:bg-green-700 text-white" onClick={() => {
-                    const a = document.createElement("a");
-                    a.href = processedUrl; a.download = downloadName; a.click();
-                 }}>
-                   <DownloadIcon className="mr-2 h-5 w-5" /> Download PDF
-                 </Button>
+                 <div className="space-y-3">
+                   <Button size="lg" className="w-full bg-green-600 hover:bg-green-700 text-white" onClick={() => {
+                      const a = document.createElement("a");
+                      a.href = processedUrl; a.download = downloadName; a.click();
+                   }}>
+                     <DownloadIcon className="mr-2 h-5 w-5" /> Download PDF
+                   </Button>
+                   <Button variant="outline" className="w-full" onClick={() => { 
+                      setFiles([]); setProcessedUrl(null); 
+                      if (fileInputRef.current) fileInputRef.current.value = '';
+                   }}>
+                     Convert another file
+                   </Button>
+                 </div>
               )}
             </div>
           )}

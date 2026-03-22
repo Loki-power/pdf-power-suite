@@ -32,8 +32,9 @@ export default function PdfToWord() {
     
     try {
       setIsProcessing(true);
-      setProgress({ status: "Parsing PDF...", value: 15 });
+      setProgress({ status: "Loading libraries...", value: 5 });
       
+      const { Document, Packer, Paragraph, TextRun } = await import("docx");
       // @ts-ignore
       const pdfjsLib = await import('pdfjs-dist/build/pdf.min.mjs');
       pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
@@ -43,29 +44,39 @@ export default function PdfToWord() {
       const loadingTask = pdfjsLib.getDocument({ data: bytes.slice() });
       const pdf = await loadingTask.promise;
       
-      let fullText = "";
+      setProgress({ status: "Extracting text and building document...", value: 20 });
+      
+      const sections = [];
       for (let i = 1; i <= pdf.numPages; i++) {
-        setProgress({ status: `Extracting Text (Page ${i})...`, value: 15 + Math.round((i/pdf.numPages) * 70) });
+        setProgress({ status: `Processing Page ${i}/${pdf.numPages}...`, value: 20 + Math.round((i/pdf.numPages) * 70) });
         const page = await pdf.getPage(i);
         const textContent = await page.getTextContent();
         const pageText = textContent.items.map((item: any) => item.str).join(" ");
-        fullText += `<p>${pageText}</p><br style="page-break-after: always;">`;
+        
+        sections.push({
+          properties: {},
+          children: [
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: pageText,
+                  size: 24, // 12pt
+                }),
+              ],
+            }),
+          ],
+        });
       }
       
-      setProgress({ status: "Formatting Document Layout...", value: 95 });
+      setProgress({ status: "Packing binary data...", value: 95 });
       
-      const docHtml = `
-      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
-      <head><meta charset="utf-8"><title>Export</title></head>
-      <body>${fullText || '<p>No text found to extract.</p>'}</body>
-      </html>`;
-      
-      const blob = new Blob([docHtml], { type: 'application/msword' });
+      const doc = new Document({ sections });
+      const blob = await Packer.toBlob(doc);
       
       setProcessedUrl(URL.createObjectURL(blob));
-      setDownloadName(`${files[0].name.replace('.pdf', '')}.doc`);
-      addHistoryItem({ action: `Converted PDF to Word (.doc)`, filename: files[0].name, module: "convert" });
-      toast.success("Word document successfully wrapped and exported!");
+      setDownloadName(`${files[0].name.replace('.pdf', '')}.docx`);
+      addHistoryItem({ action: `Converted PDF to Word (.docx)`, filename: files[0].name, module: "convert" });
+      toast.success("Binary Word document (.docx) generated successfully!");
     } catch (e: any) {
       console.error(e);
       toast.error(`Failed to convert PDF to Word: ${e.message}`);
