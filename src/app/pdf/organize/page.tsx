@@ -126,7 +126,7 @@ export default function OrganizePages() {
         // Use unpkg explicitly to avoid Webpack strict __esModule export errors
         // @ts-ignore
         const pdfjsLib = await import('pdfjs-dist/build/pdf.min.mjs');
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/legacy/build/pdf.worker.min.mjs`;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 
         const arrayBuffer = await selected.arrayBuffer();
         const bytes = new Uint8Array(arrayBuffer);

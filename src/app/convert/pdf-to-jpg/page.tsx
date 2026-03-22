@@ -37,7 +37,7 @@ export default function PdfToJpg() {
 
       // @ts-ignore
       const pdfjsLib = await import('pdfjs-dist/build/pdf.min.mjs');
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+      pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 
       const arrayBuffer = await files[0].arrayBuffer();
       const bytes = new Uint8Array(arrayBuffer);
@@ -130,12 +130,20 @@ export default function PdfToJpg() {
                   </Button>
                 </>
               ) : (
-                 <Button size="lg" className="w-full bg-green-600 hover:bg-green-700 text-white" onClick={() => {
-                    const a = document.createElement("a");
-                    a.href = processedUrl; a.download = downloadName; a.click();
-                 }}>
-                   <DownloadIcon className="mr-2 h-5 w-5" /> Download Images ZIP
-                 </Button>
+                 <div className="space-y-3">
+                   <Button size="lg" className="w-full bg-green-600 hover:bg-green-700 text-white" onClick={() => {
+                      const a = document.createElement("a");
+                      a.href = processedUrl; a.download = downloadName; a.click();
+                   }}>
+                     <DownloadIcon className="mr-2 h-5 w-5" /> Download Images ZIP
+                   </Button>
+                   <Button variant="outline" className="w-full" onClick={() => { 
+                      setFiles([]); setProcessedUrl(null); 
+                      if (fileInputRef.current) fileInputRef.current.value = '';
+                   }}>
+                     Convert another file
+                   </Button>
+                 </div>
               )}
             </div>
           )}

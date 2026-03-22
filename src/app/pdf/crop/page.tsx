@@ -34,7 +34,7 @@ export default function CropPDF() {
         // Generate thumbnail for cropping reference
         // @ts-ignore
         const pdfjsLib = await import('pdfjs-dist/build/pdf.min.mjs');
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 
         const loadingTask = pdfjsLib.getDocument({ data: bytes.slice() });
         const pdf = await loadingTask.promise;

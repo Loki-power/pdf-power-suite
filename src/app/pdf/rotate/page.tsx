@@ -38,7 +38,7 @@ export default function RotatePages() {
       try {
         // @ts-ignore
         const pdfjsLib = await import('pdfjs-dist/build/pdf.min.mjs');
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/legacy/build/pdf.worker.min.mjs`;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
 
         const arrayBuffer = await selected.arrayBuffer();
         const bytes = new Uint8Array(arrayBuffer);

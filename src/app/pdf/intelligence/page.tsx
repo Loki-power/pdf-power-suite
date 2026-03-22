@@ -76,7 +76,7 @@ export default function Intelligence() {
         try {
            // @ts-ignore
            const pdfjsLib = await import('pdfjs-dist/build/pdf.min.mjs');
-           pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+           pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
            
            const loadingTask = pdfjsLib.getDocument({ data: fileBytes as Uint8Array });
            const pdf = await loadingTask.promise;
