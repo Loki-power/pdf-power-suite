@@ -51,20 +51,56 @@ export default function PdfToWord() {
         setProgress({ status: `Processing Page ${i}/${pdf.numPages}...`, value: 20 + Math.round((i/pdf.numPages) * 70) });
         const page = await pdf.getPage(i);
         const textContent = await page.getTextContent();
-        const pageText = textContent.items.map((item: any) => item.str).join(" ");
+        const items = textContent.items as any[];
+        
+        // --- Layout-Aware Grouping ---
+        // 1. Group items by their Y-coordinate (transform[5])
+        const rows: { [key: number]: any[] } = {};
+        const threshold = 5; // Pixels to consider on the same line
+        
+        items.forEach(item => {
+          const y = Math.round(item.transform[5] / threshold) * threshold;
+          if (!rows[y]) rows[y] = [];
+          rows[y].push(item);
+        });
+        
+        // 2. Sort Y-coordinates from Top to Bottom (PDF Y is 0 at bottom usually)
+        const sortedY = Object.keys(rows).map(Number).sort((a, b) => b - a);
+        
+        const pageParagraphs = [];
+        for (const y of sortedY) {
+          const rowItems = rows[y].sort((a, b) => a.transform[4] - b.transform[4]);
+          
+          let lineText = "";
+          let lastX = -1;
+          
+          rowItems.forEach(item => {
+            // Add a space if there's a significant gap between items
+            if (lastX !== -1 && (item.transform[4] - lastX) > (item.width || 5)) {
+              lineText += " ";
+            }
+            lineText += item.str;
+            lastX = item.transform[4] + (item.width || 0);
+          });
+          
+          if (lineText.trim()) {
+            pageParagraphs.push(
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: lineText,
+                    size: 24, // 12pt
+                  }),
+                ],
+                spacing: { before: 100 }, // Brief space between lines
+              })
+            );
+          }
+        }
         
         sections.push({
           properties: {},
-          children: [
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: pageText,
-                  size: 24, // 12pt
-                }),
-              ],
-            }),
-          ],
+          children: pageParagraphs,
         });
       }
       

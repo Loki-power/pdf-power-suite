@@ -41,6 +41,7 @@ export default function Security() {
   const { addHistoryItem } = useHistory();
   
   const [isProcessing, setIsProcessing] = useState(false);
+  const [progress, setProgress] = useState<{ status: string; value: number } | null>(null);
   const [processedUrl, setProcessedUrl] = useState<string | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -74,25 +75,27 @@ export default function Security() {
       
       const { jsPDF } = await import("jspdf");
       
-      // Initialize jsPDF with encryption if passwords or restrictions are set
-      // Note: jsPDF permissions are an array of allowed actions
+      // Initialize jsPDF
+      const doc = new jsPDF();
+      
+      // Set encryption explicitly via method call
       const allowedPermissions = [];
       if (!preventPrint) allowedPermissions.push("print");
       if (!preventCopy) allowedPermissions.push("copy");
       if (!preventModify) allowedPermissions.push("modify");
       
-      const doc = new jsPDF({
-        encryption: {
-          userPassword: password || undefined,
-          ownerPassword: (password || "owner") + "-protected",
-          userPermissions: allowedPermissions as any
-        }
+      // @ts-ignore
+      doc.setEncryption({
+        userPassword: password || undefined,
+        ownerPassword: (password || "admin") + "-sec",
+        userPermissions: allowedPermissions
       });
       
       // Process each page
       for (let i = 1; i <= pdf.numPages; i++) {
+        setProgress({ status: `Securing Page ${i}/${pdf.numPages}...`, value: 20 + Math.round((i/pdf.numPages) * 70) });
         const page = await pdf.getPage(i);
-        const viewport = page.getViewport({ scale: 2.0 }); // High resolution for quality
+        const viewport = page.getViewport({ scale: 2.0 }); 
         
         const canvas = document.createElement("canvas");
         const context = canvas.getContext("2d");
@@ -105,13 +108,12 @@ export default function Security() {
           
           if (i > 1) doc.addPage([viewport.width, viewport.height], viewport.width > viewport.height ? "l" : "p");
           else {
-              // Adjust first page size
+              // Adjust first page size to match source
               // @ts-ignore
               doc.deletePage(1);
               doc.addPage([viewport.width, viewport.height], viewport.width > viewport.height ? "l" : "p");
           }
           
-          // Use pt to mm conversion or just set internal size
           const width = doc.internal.pageSize.getWidth();
           const height = doc.internal.pageSize.getHeight();
           doc.addImage(imgData, "JPEG", 0, 0, width, height);
@@ -130,6 +132,7 @@ export default function Security() {
       toast.error("Failed to secure PDF. Ensure the file is not corrupted.");
     } finally {
       setIsProcessing(false);
+      setProgress(null);
     }
   };
 
@@ -265,21 +268,34 @@ export default function Security() {
                       </div>
                     </div>
 
-                    <Button 
-                      size="lg" 
-                      className="w-full text-lg bg-purple-600 hover:bg-purple-700 text-white" 
-                      onClick={processSecurity} 
-                      disabled={isProcessing}
-                    >
-                      {isProcessing ? (
-                        <>
-                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                          Securing Document...
-                        </>
-                      ) : (
-                        "Apply Security Settings"
+                    <div className="space-y-4 pt-4 border-t">
+                      {progress && (
+                        <div className="space-y-2 mb-4 p-4 rounded-xl border bg-muted/20">
+                          <div className="flex justify-between text-sm font-medium">
+                            <span>{progress.status}</span>
+                            <span>{progress.value}%</span>
+                          </div>
+                          <div className="h-2 bg-muted rounded-full overflow-hidden">
+                            <div className="h-full bg-purple-500 transition-all duration-300" style={{ width: `${progress.value}%` }} />
+                          </div>
+                        </div>
                       )}
-                    </Button>
+                      <Button 
+                        size="lg" 
+                        className="w-full text-lg bg-purple-600 hover:bg-purple-700 text-white" 
+                        onClick={processSecurity} 
+                        disabled={isProcessing}
+                      >
+                        {isProcessing ? (
+                          <>
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                            {progress ? "Processing..." : "Securing Document..."}
+                          </>
+                        ) : (
+                          "Apply Security Settings"
+                        )}
+                      </Button>
+                    </div>
                   </TabsContent>
                   
                   <TabsContent value="unlock" className="space-y-8 animate-in fade-in">
