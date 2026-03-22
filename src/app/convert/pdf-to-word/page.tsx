@@ -18,7 +18,7 @@ export default function PdfToWord() {
   const { addHistoryItem } = useHistory();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const VERSION = "2.5 (AI-OCR PRO)";
+  const VERSION = "2.6 (AI-VISION PRO)";
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -62,7 +62,7 @@ export default function PdfToWord() {
       for (let i = 1; i <= pdf.numPages; i++) {
         setProgress({ status: `AI-OCR Scanning Page ${i}/${pdf.numPages}...`, value: 10 + Math.round((i/pdf.numPages) * 85) });
         const page = await pdf.getPage(i);
-        const viewport = page.getViewport({ scale: 3.5 }); // High-res for Kruti Dev/scanned text
+        const viewport = page.getViewport({ scale: 4.5 }); // Ultra-high-res for sub-pixel script precision
         
         const canvas = document.createElement("canvas");
         const context = canvas.getContext("2d");
@@ -72,7 +72,21 @@ export default function PdfToWord() {
         const pageParagraphs: any[] = [];
         
         if (context) {
+          // 1. Render high-res
           await page.render({ canvasContext: context as any, viewport: viewport }).promise;
+          
+          // 2. Pre-process Image (Grayscale & Adaptive Contrast)
+          const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imageData.data;
+          for (let j = 0; j < data.length; j += 4) {
+            // Luma formula for better grayscale
+            const gray = 0.299 * data[j] + 0.587 * data[j + 1] + 0.114 * data[j + 2];
+            // Slightly softer threshold to preserve thin ligatures
+            const val = gray > 180 ? 255 : 0; 
+            data[j] = data[j + 1] = data[j + 2] = val;
+          }
+          context.putImageData(imageData, 0, 0);
+
           const blob = await new Promise<Blob>((resolve) => canvas.toBlob(b => resolve(b!), "image/png"));
           
           const { data: { text } } = await worker.recognize(blob);
@@ -81,13 +95,28 @@ export default function PdfToWord() {
           const snippet = text.trim().substring(0, 200);
           if (snippet) setPreviewText(prev => (prev ? prev + "\n---\n" : "") + snippet + "...");
 
+          // 3. Clean and Normalize Text
+          const cleanText = (raw: string) => {
+            return raw
+              .normalize('NFC')
+              // Remove control characters and weird symbols that look like squares
+              .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F\uFFFD\u25A1]/g, '')
+              .trim();
+          };
+
           text.split('\n').forEach(line => {
-            const trimmed = line.trim();
-            if (trimmed) {
+            const cleaned = cleanText(line);
+            if (cleaned) {
               pageParagraphs.push(
                 new Paragraph({
-                  children: [new TextRun({ text: trimmed, size: 24, font: "Mangal" })],
-                  spacing: { before: 200, line: 400 } // Professional line height
+                  children: [
+                    new TextRun({ 
+                      text: cleaned, 
+                      size: 24, 
+                      font: { name: "Mangal", hint: "eastAsia" } // Explicit font hint for Word
+                    })
+                  ],
+                  spacing: { before: 200, line: 400 }
                 })
               );
             }
