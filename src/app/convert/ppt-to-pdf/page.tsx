@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { PDFDocument } from "pdf-lib";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import JSZip from "jszip";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -29,28 +30,65 @@ export default function PptToPdf() {
     if (files.length === 0) return;
     try {
        setIsProcessing(true);
-       setProgress({ status: `Analyzing raw PowerPoint stream...`, value: 20 });
+       setProgress({ status: `Unzipping PowerPoint structure...`, value: 20 });
        
-       await new Promise(r => setTimeout(r, 1500));
-       setProgress({ status: "Rendering layout engine...", value: 60 });
-       await new Promise(r => setTimeout(r, 1000));
-       setProgress({ status: "Compiling vector data...", value: 90 });
+       const arrayBuffer = await files[0].arrayBuffer();
+       const zip = await JSZip.loadAsync(arrayBuffer);
+       
+       setProgress({ status: "Extracting slides...", value: 40 });
+       
+       // Find all slide XML files
+       const slideFiles: JSZip.JSZipObject[] = [];
+       zip.folder("ppt/slides")?.forEach((relativePath, file) => {
+           if (relativePath.startsWith("slide") && relativePath.endsWith(".xml")) {
+               slideFiles.push(file);
+           }
+       });
+       
+       if (slideFiles.length === 0) {
+           throw new Error("No slides found in this PowerPoint file.");
+       }
        
        const pdfDoc = await PDFDocument.create();
-       const page = pdfDoc.addPage([1024, 768]); // standard presentation aspect
-       page.drawText(`Converted offline from: ${files[0].name}\n\nClient-side PowerPoint mapping completed.`, {
-           x: 50, y: page.getSize().height - 100, size: 24 
-       });
+       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+       
+       setProgress({ status: "Rendering slides to PDF...", value: 60 });
+       
+       for (let i = 0; i < slideFiles.length; i++) {
+           const slideXml = await slideFiles[i].async("string");
+           
+           // Extract text fragments
+           const textRegex = /<a:t>([^<]*)<\/a:t>/g;
+           let tMatch;
+           const slideText: string[] = [];
+           while ((tMatch = textRegex.exec(slideXml)) !== null) {
+               if (tMatch[1].trim()) slideText.push(tMatch[1].replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>'));
+           }
+           
+           const page = pdfDoc.addPage([1024, 768]); // Landscape 4:3
+           
+           page.drawText(`Slide ${i + 1}`, { x: 50, y: 720, size: 24, font, color: rgb(0.5, 0.5, 0.5) });
+           
+           let yOffset = 600;
+           for (const text of slideText) {
+               page.drawText(text.substring(0, 100) + (text.length > 100 ? "..." : ""), { 
+                   x: 100, y: yOffset, size: 20, font 
+               });
+               yOffset -= 30;
+               if (yOffset < 50) break; // Simple overflow prevention for the crude parser
+           }
+       }
        
        const pdfBytes = await pdfDoc.save();
        const blob = new Blob([pdfBytes as any], { type: "application/pdf" });
        setProcessedUrl(URL.createObjectURL(blob));
        setDownloadName(`${files[0].name.split('.')[0]}.pdf`);
        
-       addHistoryItem({ action: `Converted PPT to PDF`, filename: files[0].name, module: "convert" });
-       toast.success(`Presentation imported and exported to PDF.`);
+       addHistoryItem({ action: `Converted ${slideFiles.length} PPT Slides to PDF`, filename: files[0].name, module: "convert" });
+       toast.success(`Presentation successfully converted to PDF.`);
     } catch (e: any) {
-       toast.error("Engine failed.");
+       console.error(e);
+       toast.error(`Engine failed: ${e.message || "Unknown error"}`);
     } finally {
        setIsProcessing(false);
        setProgress(null);

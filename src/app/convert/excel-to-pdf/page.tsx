@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { PDFDocument } from "pdf-lib";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import JSZip from "jszip";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -29,28 +30,61 @@ export default function ExcelToPdf() {
     if (files.length === 0) return;
     try {
        setIsProcessing(true);
-       setProgress({ status: `Analyzing raw Excel stream...`, value: 20 });
+       setProgress({ status: `Unzipping Excel structure...`, value: 20 });
        
-       await new Promise(r => setTimeout(r, 1500));
-       setProgress({ status: "Rendering layout engine...", value: 60 });
-       await new Promise(r => setTimeout(r, 1000));
-       setProgress({ status: "Compiling vector data...", value: 90 });
+       const arrayBuffer = await files[0].arrayBuffer();
+       const zip = await JSZip.loadAsync(arrayBuffer);
+       
+       setProgress({ status: "Extracting strings...", value: 40 });
+       const sharedStringsFile = zip.file("xl/sharedStrings.xml");
+       
+       if (!sharedStringsFile) {
+         throw new Error("No shared strings found in Excel document. (Might be empty)");
+       }
+       
+       const xmlContent = await sharedStringsFile.async("string");
+       
+       setProgress({ status: "Parsing text nodes...", value: 60 });
+       const textRegex = /<t>([^<]*)<\/t>/g;
+       let tMatch;
+       const strings: string[] = [];
+       while ((tMatch = textRegex.exec(xmlContent)) !== null) {
+           if (tMatch[1].trim()) strings.push(tMatch[1].replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>'));
+       }
        
        const pdfDoc = await PDFDocument.create();
-       const page = pdfDoc.addPage();
-       page.drawText(`Converted offline from: ${files[0].name}\n\nClient-side Excel mapping completed.`, {
-           x: 50, y: page.getSize().height - 100, size: 14 
-       });
+       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+       
+       setProgress({ status: "Exporting grid layout to PDF...", value: 80 });
+       
+       const fontSize = 10;
+       const lineHeight = 14;
+       let page = pdfDoc.addPage();
+       let { width, height } = page.getSize();
+       let yOffset = height - 50;
+       
+       page.drawText(`Extracted String Data from ${files[0].name}`, { x: 50, y: yOffset, size: 14, font, color: rgb(0,0.5,0) });
+       yOffset -= 30;
+       
+       for (const text of strings) {
+           page.drawText(text.substring(0, 100), { x: 50, y: yOffset, size: fontSize, font });
+           yOffset -= lineHeight;
+           if (yOffset < 50) {
+               page = pdfDoc.addPage();
+               yOffset = height - 50;
+           }
+       }
        
        const pdfBytes = await pdfDoc.save();
        const blob = new Blob([pdfBytes as any], { type: "application/pdf" });
        setProcessedUrl(URL.createObjectURL(blob));
        setDownloadName(`${files[0].name.split('.')[0]}.pdf`);
        
-       addHistoryItem({ action: `Converted Excel to PDF`, filename: files[0].name, module: "convert" });
-       toast.success(`Spreadsheet structure imported and exported to PDF.`);
+       addHistoryItem({ action: `Converted Excel data back to PDF`, filename: files[0].name, module: "convert" });
+       toast.success(`Excel document data extracted and rendered to PDF.`);
     } catch (e: any) {
-       toast.error("Engine failed.");
+       console.error(e);
+       toast.error(`Engine failed: ${e.message || "Unknown error"}`);
     } finally {
        setIsProcessing(false);
        setProgress(null);

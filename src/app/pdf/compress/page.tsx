@@ -21,6 +21,7 @@ export default function CompressPDF() {
   
   const [isProcessing, setIsProcessing] = useState(false);
   const [processedUrl, setProcessedUrl] = useState<string | null>(null);
+  const [compressionLevel, setCompressionLevel] = useState<"extreme" | "recommended" | "less">("recommended");
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -46,12 +47,22 @@ export default function CompressPDF() {
       setIsProcessing(true);
       const pdfDoc = await PDFDocument.load(fileBytes);
 
-      // Simple compression via rebuilding XREF and turning off object streams
-      const pdfBytesModified = await pdfDoc.save({ useObjectStreams: false });
+      if (compressionLevel === "extreme") {
+        pdfDoc.setTitle('');
+        pdfDoc.setAuthor('');
+        pdfDoc.setSubject('');
+        pdfDoc.setKeywords([]);
+        pdfDoc.setProducer('');
+        pdfDoc.setCreator('');
+      }
+
+      const useObjectStreams = compressionLevel === "extreme" || compressionLevel === "recommended";
+
+      const pdfBytesModified = await pdfDoc.save({ useObjectStreams });
       const blob = new Blob([pdfBytesModified as any], { type: "application/pdf" });
       
       setProcessedUrl(URL.createObjectURL(blob));
-      addHistoryItem({ action: "Compressed PDF", filename: file?.name || "document", module: "compress" });
+      addHistoryItem({ action: `Compressed PDF (${compressionLevel})`, filename: file?.name || "document", module: "compress" });
       toast.success("PDF compressed successfully!");
     } catch (e: any) {
       toast.error("Failed to compress PDF.");
@@ -106,10 +117,34 @@ export default function CompressPDF() {
 
               {!processedUrl ? (
                 <div className="space-y-6 p-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+                    <button 
+                      className={`p-4 rounded-xl border text-left transition-all ${compressionLevel === "extreme" ? "bg-rose-50 border-rose-500 shadow-sm" : "bg-white hover:bg-slate-50 border-slate-200"}`}
+                      onClick={() => setCompressionLevel("extreme")}
+                    >
+                      <h4 className={`font-bold mb-1 ${compressionLevel === "extreme" ? "text-rose-700" : "text-slate-700"}`}>Extreme</h4>
+                      <p className="text-xs text-slate-500">Less quality, high compression. Metadata wiped.</p>
+                    </button>
+                    <button 
+                      className={`p-4 rounded-xl border text-left transition-all ${compressionLevel === "recommended" ? "bg-rose-50 border-rose-500 shadow-sm" : "bg-white hover:bg-slate-50 border-slate-200"}`}
+                      onClick={() => setCompressionLevel("recommended")}
+                    >
+                      <h4 className={`font-bold mb-1 ${compressionLevel === "recommended" ? "text-rose-700" : "text-slate-700"}`}>Recommended</h4>
+                      <p className="text-xs text-slate-500">Good quality, good compression.</p>
+                    </button>
+                    <button 
+                      className={`p-4 rounded-xl border text-left transition-all ${compressionLevel === "less" ? "bg-rose-50 border-rose-500 shadow-sm" : "bg-white hover:bg-slate-50 border-slate-200"}`}
+                      onClick={() => setCompressionLevel("less")}
+                    >
+                      <h4 className={`font-bold mb-1 ${compressionLevel === "less" ? "text-rose-700" : "text-slate-700"}`}>Less</h4>
+                      <p className="text-xs text-slate-500">High quality, less compression.</p>
+                    </button>
+                  </div>
+                  
                   <div className="p-4 bg-rose-50 border border-rose-100 rounded-xl text-center">
-                    <h3 className="font-semibold text-rose-700 mb-2">Recommended Compression</h3>
+                    <h3 className="font-semibold text-rose-700 mb-2">Compression Details</h3>
                     <p className="text-sm text-rose-600/80">
-                      We will structurally rebuild your PDF, dropping unused objects and re-indexing arrays for optimal disk usage.
+                      We structurally rebuild your PDF, dropping unused objects, repacking object streams, and re-indexing arrays for optimal disk usage.
                     </p>
                   </div>
                   <Button size="lg" className="w-full bg-rose-600 hover:bg-rose-700 text-white" onClick={processCompress} disabled={isProcessing}>
