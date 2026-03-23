@@ -139,7 +139,7 @@ export default function PdfToWord() {
                <Settings2Icon className="mr-2 h-3 w-3 text-orange-500" /> Script Mode
             </label>
             <select 
-              className="w-full bg-slate-900 border border-white/10 rounded-2xl p-4 text-xs font-bold text-white outline-none focus:ring-2 focus:ring-orange-500/50 transition-all"
+              className="w-full bg-white border border-slate-200 rounded-2xl p-4 text-xs font-bold text-slate-800 outline-none focus:ring-2 focus:ring-orange-500/50 transition-all shadow-sm"
               value={selectedLang}
               onChange={(e) => setSelectedLang(e.target.value)}
             >
@@ -149,14 +149,14 @@ export default function PdfToWord() {
           </div>
           
           <div 
-            className="flex items-center space-x-4 p-5 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 transition-all cursor-pointer group" 
+            className="flex items-center space-x-4 p-5 rounded-2xl border border-slate-200/60 bg-white hover:bg-slate-50 transition-all cursor-pointer group shadow-sm" 
             onClick={() => setStripEnglish(!stripEnglish)}
           >
-            <div className={`h-6 w-6 rounded-lg border-2 flex items-center justify-center transition-all ${stripEnglish ? 'bg-orange-500 border-orange-500 shadow-lg shadow-orange-500/20' : 'border-slate-700'}`}>
+            <div className={`h-6 w-6 rounded-lg border-2 flex items-center justify-center transition-all ${stripEnglish ? 'bg-orange-500 border-orange-500 shadow-lg shadow-orange-500/20' : 'border-slate-300'}`}>
                {stripEnglish && <div className="h-2 w-2 bg-white rounded-full" />}
             </div>
             <div className="flex flex-col">
-               <span className="text-[10px] font-black uppercase text-white tracking-tight">Pure Unicode Rebuild</span>
+               <span className="text-[10px] font-black uppercase text-slate-800 tracking-tight">Pure Unicode Rebuild</span>
                <span className="text-[9px] text-slate-500 font-medium leading-tight">Removes Latin residues & noise</span>
             </div>
           </div>
