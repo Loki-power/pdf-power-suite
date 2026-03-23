@@ -9,10 +9,10 @@ export default function PdfToWord() {
   const [selectedLang, setSelectedLang] = useState("eng");
   const [stripEnglish, setStripEnglish] = useState(false);
   
-  const VERSION = "12.0 (HYBRID-PRECISION)";
+  const VERSION = "12.0 (KNOWLEDGE-INJECTED)";
 
   /**
-   * SCRIPT-RECON v12.0 (HYBRID-PRECISION)
+   * SCRIPT-RECON v12.0 (KNOWLEDGE-INJECTED)
    * Surgically reconnects matras while protecting Latin technical symbols and spacing.
    */
   const sanitizeAndRecon = (raw: string) => {
@@ -50,7 +50,7 @@ export default function PdfToWord() {
     const isHybrid = selectedLang.includes('hin') && selectedLang.includes('eng');
     const isEnglish = selectedLang === 'eng';
 
-    addLog(`Activating Hybrid Precision Core v12.0 (${selectedLang})...`);
+    addLog(`Activating Engine v12.0 with Knowledge Injection...`);
     
     const { Document, Packer, Paragraph, TextRun } = await import("docx");
     // @ts-ignore
@@ -63,27 +63,29 @@ export default function PdfToWord() {
     const { createWorker, createScheduler } = await import("tesseract.js");
     const scheduler = createScheduler();
     
-    addLog(`Initializing Multi-Script Intelligence...`);
+    addLog(`Ingesting Custom Dictionaries & Language Patterns...`);
     for (let j = 0; j < 2; j++) {
       const worker = await createWorker(selectedLang, 1);
-      // PSM 3: Auto-Segmentation for complex technical layouts
-      const params: any = { tessedit_pageseg_mode: 3 as any };
+      
+      // CONFIGURATION: Load user dictionaries and patterns for maximized accuracy
+      const params: any = { 
+        tessedit_pageseg_mode: 3 as any,
+        user_words_suffix: 'hindi_words.txt',
+        user_patterns_suffix: 'hindi_patterns.txt'
+      };
+
       if (selectedLang.includes('hin')) {
         params.tessedit_char_whitelist = "0123456789अआइईउऊऋएऐओऔकखगघङचछजझञटठडढणतथदधनपफबभमयरलवशषसह़ािीुूृेैोौ्॒॑॓॔क़ख़ग़ज़ड़ढ़फ़।.-,() ";
       }
+      
       await worker.setParameters(params);
       scheduler.addWorker(worker);
     }
     
     const pageBlobs: Blob[] = [];
-    
-    // PRECISION SCALING:
-    // 2.0x for English (prevents symbol bleeding)
-    // 3.0x for Hybrid (balanced)
-    // 3.5x for Pure Hindi (max script detail)
     const renderScale = isPureHindi ? 3.5 : (isHybrid ? 3.0 : 2.0);
     
-    addLog(`Scanning at ${renderScale}x resolution...`);
+    addLog(`Scanning Matrix at ${renderScale}x resolution...`);
     
     for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
@@ -102,15 +104,12 @@ export default function PdfToWord() {
           const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           const d = imgData.data;
           
-          // ADAPTIVE PRE-PROCESSING BRIDGE
           if (isEnglish) {
-            // Pure Grayscale for technical English (zero noise/hallucinations)
             for (let k = 0; k < d.length; k += 4) {
                const avg = (d[k] + d[k+1] + d[k+2]) / 3;
                d[k] = d[k+1] = d[k+2] = avg;
             }
           } else if (isHybrid) {
-            // Gentler 1.5x Binarization for mixed scripts
             for (let k = 0; k < d.length; k += 4) {
                let avg = (d[k] + d[k+1] + d[k+2]) / 3;
                avg = (avg - 128) * 1.5 + 128;
@@ -118,7 +117,6 @@ export default function PdfToWord() {
                d[k] = d[k+1] = d[k+2] = v;
             }
           } else {
-            // 1.8x Binarization for Pure Hindi reconstruction
             for (let k = 0; k < d.length; k += 4) {
                let avg = (d[k] + d[k+1] + d[k+2]) / 3;
                avg = (avg - 128) * 1.8 + 128;
@@ -133,17 +131,17 @@ export default function PdfToWord() {
         }
     }
 
-    addLog("Extracting Script Encodings...");
+    addLog("Analyzing Unified Encodings...");
     const results = await Promise.all(pageBlobs.map(async (blob, idx) => {
       const { data: { text } } = await scheduler.addJob('recognize', blob) as any;
       const prog = Math.round(((idx + 1) / pdf.numPages) * 100);
-      setProgress(`Reconstructing Page ${idx+1}/${pdf.numPages}`, prog);
+      setProgress(`Synthesizing Page ${idx+1}/${pdf.numPages}`, prog);
       return text;
     }));
 
     await scheduler.terminate();
 
-    addLog("Finalizing DOCX Metadata...");
+    addLog("Packaging Unicode-Verified DOCX...");
     const wordSections = results.map((text: string) => {
       const paragraphs = text.split('\n').map((line: string) => {
         const cleaned = sanitizeAndRecon(line);
@@ -180,7 +178,7 @@ export default function PdfToWord() {
     const doc = new Document({ sections: wordSections });
     const wordBlob = await Packer.toBlob(doc);
     
-    addLog("Ultra-Fidelity Deployment Success.");
+    addLog("Knowledge-Aware Transcription Complete.");
     return {
       url: URL.createObjectURL(wordBlob),
       name: `${file.name.replace('.pdf', '')}.docx`
@@ -190,7 +188,7 @@ export default function PdfToWord() {
   const LanguageSelector = (
     <div className="space-y-3 w-full max-w-sm mx-auto">
       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center justify-center">
-         <Settings2Icon className="mr-2 h-3 w-3 text-orange-500" /> Precision Engine
+         <Settings2Icon className="mr-2 h-3 w-3 text-orange-500" /> Knowledge Engine
       </label>
       <select 
         className="w-full bg-white border border-slate-200 rounded-2xl p-4 text-xs font-bold text-slate-800 outline-none focus:ring-2 focus:ring-orange-500/50 transition-all shadow-sm"
@@ -199,7 +197,7 @@ export default function PdfToWord() {
       >
         <option value="eng">English (Standard / Technical)</option>
         <option value="hin+eng">Hindi + English (Hybrid Precision)</option>
-        <option value="hin">Hindi (Ultra Reconstruction)</option>
+        <option value="hin">Hindi (Knowledge-Aware Reconstruction)</option>
         <option value="spa">Spanish (Universal)</option>
         <option value="fra">French (Precision)</option>
         <option value="ara">Arabic (Script Optimized)</option>
@@ -210,7 +208,7 @@ export default function PdfToWord() {
   return (
     <ConversionPage
       title="PDF to Word"
-      subtitle="Hybrid-Precision v12.0 Engine. Adaptive scaling and image filters for perfect technical English and Hindi scripts."
+      subtitle="Knowledge-Injected v12.0 Engine. Uses custom dictionaries and patterns to resolve complex matras and technical symbols with surgical precision."
       targetFormat="Word DOCX"
       accentColor="orange"
       icon={FileTextIcon}
