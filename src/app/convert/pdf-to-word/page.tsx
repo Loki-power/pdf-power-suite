@@ -71,7 +71,7 @@ export default function PdfToWord() {
     
     for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
-        const viewport = page.getViewport({ scale: 2.5 }); // Optimized scale for speed
+        const viewport = page.getViewport({ scale: 3.5 }); // Increased scale for better Hindi fidelity
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
         canvas.height = viewport.height;
@@ -113,8 +113,9 @@ export default function PdfToWord() {
                 text: cleaned, 
                 size: 24, 
                 font: selectedLang.includes('hin') ? { 
-                  name: "Nirmala UI", 
-                  cs: "Nirmala UI",
+                  name: "Mangal", 
+                  cs: "Mangal",
+                  eastAsia: "Nirmala UI, Kokila",
                   hint: "cs" 
                 } : {
                   name: "Arial"
