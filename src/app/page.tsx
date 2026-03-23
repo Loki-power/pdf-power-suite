@@ -1,3 +1,4 @@
+// FORCE PUSH VERIFICATION: NEW CONVERSION TOOLS AND LIGHT THEME
 import { Card, CardContent } from "@/components/ui/card";
 import { 
   FilePlusIcon, Grid2x2Icon, ShieldCheckIcon,
