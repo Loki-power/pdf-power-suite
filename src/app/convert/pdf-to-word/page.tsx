@@ -9,45 +9,53 @@ export default function PdfToWord() {
   const [selectedLang, setSelectedLang] = useState("eng");
   const [stripEnglish, setStripEnglish] = useState(false);
   
-  const VERSION = "10.0 (ADAPTIVE-CORE)";
+  const VERSION = "11.0 (SURGICAL-RECON)";
 
   /**
-   * SCRIPT-RECON v10.0 (ADAPTIVE-CORE)
-   * Intelligently preserves word boundaries while restoring script fragments.
+   * SCRIPT-RECON v11.0 (SURGICAL-RECON)
+   * Surgically reconnects matras to their base consonants without swallowing word boundaries.
    */
   const sanitizeAndRecon = (raw: string) => {
-    // 1. Level 1: Basic XML/PUA Sanitation
+    // 1. Basic XML/PUA Sanitation
     let t = raw.replace(/[\u0000-\u001F\uD800-\uDFFF\uFFFE\uFFFF\uE000-\uF8FF\u25CC\u25A1]/g, "");
     
-    // 2. Adaptive Logic
+    // 2. Surgical Hindi Reconstruction
     if (selectedLang.includes('hin')) {
       t = t.normalize('NFKD');
 
-      // CONSERVATIVE JOINING: Only join if the next character is a Matra, Halant, or Modifier
-      // We no longer join two consonants across a space to prevent "Sanskrit-ification"
-      t = t.replace(/([\u0900-\u097F])\s+([\u093A-\u094F\u0900-\u0903\u093C])/g, "$1$2");
+      // Rule A: Reconnect "Post-Consonant" Matras/Modifiers to the PREVIOUS consonant
+      // Examples: "क ा" -> "का", "क े" -> "के"
+      // Only joins if the character AFTER the space is a trailing modifier
+      t = t.replace(/([\u0915-\u0939])\s+([\u093E\u0940-\u0948\u094B\u094C\u094D\u0901-\u0903\u093C])/g, "$1$2");
       
-      // Fix Short-I (Separated)
-      t = t.replace(/([\u093F])\s*([\u0900-\u097F])/g, '$2$1');
+      // Rule B: Reconnect "Pre-Consonant" Matra (Short-I) to the NEXT consonant
+      // Example: "ि न" -> "नि"
+      t = t.replace(/([\u093F])\s+([\u0915-\u0939])/g, '$2$1');
       
-      // Recompose
+      // Rule C: Fix misplaced Short-I that was OCR'd after but logically belongs before (in visual order)
+      // but correctly placed after in Unicode order.
+      // Already handled by Rule A if it was "क ि" -> "कि" (\u0928\u093f)
+      
+      // Rule D: Join Halant-Conjunctions inside a word
+      t = t.replace(/([\u094D])\s+([\u0915-\u0939])/g, '$1$2');
+
+      // Recompose for Standard Word Rendering
       t = t.normalize('NFC');
 
       if (stripEnglish) {
         t = t.replace(/[a-zA-Z]/g, '');
       }
     } else {
-      // Standard English/Latin Cleaning: Just normalize and trim
       t = t.normalize('NFC');
     }
     
-    // Normalize spaces: prevent multiple spaces but PRESERVE word boundaries
+    // Final space normalization (Never swallows spaces between two valid consonant-bases)
     return t.trim().replace(/\s+/g, ' ');
   };
 
   const processFile = async (file: File, setProgress: (status: string, value: number) => void, addLog: (msg: string) => void) => {
     const isHindi = selectedLang.includes('hin');
-    addLog(`Activating Adaptive OCR Core v10.0 (${isHindi ? 'High Fidelity' : 'Balanced'})...`);
+    addLog(`Activating Surgical-Recon Core v11.0 (${isHindi ? 'High Fidelity' : 'Balanced'})...`);
     
     const { Document, Packer, Paragraph, TextRun } = await import("docx");
     // @ts-ignore
@@ -60,10 +68,10 @@ export default function PdfToWord() {
     const { createWorker, createScheduler } = await import("tesseract.js");
     const scheduler = createScheduler();
     
-    addLog(`Deploying ${isHindi ? 'Specialized' : 'Standard'} Workers...`);
+    addLog(`Deploying Intelligent Workers...`);
     for (let j = 0; j < 2; j++) {
       const worker = await createWorker(selectedLang, 1);
-      // PSM 3: Auto Page Segmentation (Handles mixed layouts better than PSM 6)
+      // PSM 3: Auto Page Segmentation (Best for mixed layouts)
       const params: any = { tessedit_pageseg_mode: 3 as any };
       if (isHindi) {
         params.tessedit_char_whitelist = "0123456789अआइईउऊऋएऐओऔकखगघङचछजझञटठडढणतथदधनपफबभमयरलवशषसह़ािीुूृेैोौ्॒॑॓॔क़ख़ग़ज़ड़ढ़फ़।.-,() ";
@@ -73,9 +81,8 @@ export default function PdfToWord() {
     }
     
     const pageBlobs: Blob[] = [];
-    // ADAPTIVE SCALE: 2.5x for English (prevents bleeding), 4.0x for Hindi (extracts microscopic matras)
-    const renderScale = isHindi ? 4.0 : 2.5;
-    addLog(`Rasterizing ${pdf.numPages} pages at ${renderScale}x resolution...`);
+    const renderScale = isHindi ? 4.5 : 2.5; // High resolution for Hindi script details
+    addLog(`Rasterizing with Surgical Precision (${renderScale}x)...`);
     
     for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
@@ -94,17 +101,16 @@ export default function PdfToWord() {
           const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           const d = imgData.data;
           
-          // ADAPTIVE PROCESSING
           if (isHindi) {
-            // High-Contrast Binarization for Hindi script reconstruction
+            // Extreme Contrast Binarization for Hindi
             for (let k = 0; k < d.length; k += 4) {
                let avg = (d[k] + d[k+1] + d[k+2]) / 3;
-               avg = (avg - 128) * 2.0 + 128;
+               avg = (avg - 128) * 2.2 + 128;
                const v = avg > 170 ? 255 : 0; 
                d[k] = d[k+1] = d[k+2] = v;
             }
           } else {
-            // Grayscale preservation for Latin text (keeps anti-aliasing edges)
+            // High-Pass Grayscale for English (anti-alias preservation)
             for (let k = 0; k < d.length; k += 4) {
                const avg = (d[k] + d[k+1] + d[k+2]) / 3;
                d[k] = d[k+1] = d[k+2] = avg;
@@ -117,17 +123,17 @@ export default function PdfToWord() {
         }
     }
 
-    addLog("Analysis Phase Parallelized...");
+    addLog("Merging Script Fragments...");
     const results = await Promise.all(pageBlobs.map(async (blob, idx) => {
       const { data: { text } } = await scheduler.addJob('recognize', blob) as any;
       const prog = Math.round(((idx + 1) / pdf.numPages) * 100);
-      setProgress(`Synthesizing Page ${idx+1}/${pdf.numPages}`, prog);
+      setProgress(`Restoring Page ${idx+1}/${pdf.numPages}`, prog);
       return text;
     }));
 
     await scheduler.terminate();
 
-    addLog("Packaging Unicode Integrity DOCX...");
+    addLog("Assembling Unicode Integrity DOCX...");
     const wordSections = results.map((text: string) => {
       const paragraphs = text.split('\n').map((line: string) => {
         const cleaned = sanitizeAndRecon(line);
@@ -164,7 +170,7 @@ export default function PdfToWord() {
     const doc = new Document({ sections: wordSections });
     const wordBlob = await Packer.toBlob(doc);
     
-    addLog("Conversion Finalized.");
+    addLog("Conversion Successfully Completed.");
     return {
       url: URL.createObjectURL(wordBlob),
       name: `${file.name.replace('.pdf', '')}.docx`
@@ -174,19 +180,20 @@ export default function PdfToWord() {
   const LanguageSelector = (
     <div className="space-y-3 w-full max-w-sm mx-auto">
       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center justify-center">
-         <Settings2Icon className="mr-2 h-3 w-3 text-orange-500" /> Adaptive Script Engine
+         <Settings2Icon className="mr-2 h-3 w-3 text-orange-500" /> Intelligence Engine
       </label>
       <select 
         className="w-full bg-white border border-slate-200 rounded-2xl p-4 text-xs font-bold text-slate-800 outline-none focus:ring-2 focus:ring-orange-500/50 transition-all shadow-sm"
         value={selectedLang}
         onChange={(e) => setSelectedLang(e.target.value)}
       >
-        <option value="eng">English (Premium Layout)</option>
-        <option value="hin+eng">Hindi + English (Expert Hybrid)</option>
-        <option value="hin">Hindi (No-Tofu Reconstruction)</option>
-        <option value="spa">Spanish (Universal)</option>
-        <option value="fra">French (Diacritic Optimized)</option>
-        <option value="ara">Arabic (Right-to-Left Core)</option>
+        <option value="eng">English (High-Fidelity Layout)</option>
+        <option value="hin+eng">Hindi + English (Surgical Hybrid)</option>
+        <option value="hin">Pure Hindi (Zero-Tofu Recon)</option>
+        <option value="spa">Spanish (Global)</option>
+        <option value="fra">French (Precision)</option>
+        <option value="deu">German (Structure)</option>
+        <option value="ara">Arabic (Right-to-Left)</option>
       </select>
     </div>
   );
@@ -194,7 +201,7 @@ export default function PdfToWord() {
   return (
     <ConversionPage
       title="PDF to Word"
-      subtitle="Adaptive-Core v10.0 OCR. Intelligently switches resolution and pre-processing based on script type for hybrid accuracy."
+      subtitle="Surgical-Recon v11.0 Engine. Intelligently reconnects script fragments while strictly preserving word boundaries."
       targetFormat="Word DOCX"
       accentColor="orange"
       icon={FileTextIcon}
