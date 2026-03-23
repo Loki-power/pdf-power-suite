@@ -309,6 +309,14 @@ export default function ConversionPage({
         </div>
       </div>
       
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        onChange={handleFileChange} 
+        accept={accept} 
+        className="hidden" 
+      />
+      
       <style key="local-styles" dangerouslySetInnerHTML={{__html: `
         @keyframes bounce-slow {
           0%, 100% { transform: translateY(0); }
