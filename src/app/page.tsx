@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen bg-slate-950 text-slate-50 selection:bg-orange-500/30 overflow-hidden font-sans">
+    <div className="relative min-h-screen bg-slate-50 text-slate-900 selection:bg-orange-500/10 overflow-hidden font-sans">
       
       {/* Dynamic Background Glows for Premium WOW Factor */}
       <div className="absolute top-0 left-1/2 w-[1200px] h-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-b from-orange-600/20 to-rose-600/20 blur-[120px] opacity-80 pointer-events-none" />
@@ -33,7 +33,7 @@ export default function Home() {
           </div>
           
           <div className="relative">
-            <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-[7rem] font-black tracking-tighter leading-[1.05] text-white drop-shadow-2xl">
+            <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-[7rem] font-black tracking-tighter leading-[1.05] text-slate-900 drop-shadow-sm">
               The Ultimate <br className="hidden sm:block"/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-rose-400 to-pink-500 drop-shadow-sm relative">
                 Document Tool.
@@ -44,7 +44,7 @@ export default function Home() {
             <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-orange-500/20 blur-[100px] animate-pulse rounded-full" />
           </div>
           
-          <p className="text-slate-400 text-lg sm:text-xl md:text-2xl font-medium leading-relaxed max-w-2xl sm:max-w-3xl mx-auto px-4">
+          <p className="text-slate-600 text-lg sm:text-xl md:text-2xl font-medium leading-relaxed max-w-2xl sm:max-w-3xl mx-auto px-4">
             Everything you need to merge, split, compress, and convert your files offline. Zero uploads. Lightning fast. Free forever.
           </p>
           
@@ -62,7 +62,7 @@ export default function Home() {
               </Button>
             </Link>
             <Link href="/convert/pdf-to-word" className="w-full sm:w-auto">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto h-16 sm:h-20 px-8 sm:px-14 text-lg sm:text-2xl font-extrabold rounded-2xl sm:rounded-full border-2 border-slate-700 hover:bg-slate-800 text-white shadow-lg transition-all hover:-translate-y-1 group bg-slate-900/80 backdrop-blur-md relative overflow-hidden">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto h-16 sm:h-20 px-8 sm:px-14 text-lg sm:text-2xl font-extrabold rounded-2xl sm:rounded-full border-2 border-slate-200 hover:bg-slate-50 text-slate-900 shadow-xl transition-all hover:-translate-y-1 group bg-white/80 backdrop-blur-md relative overflow-hidden">
                 <span className="absolute inset-0 bg-white/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
                 <div className="flex items-center justify-center relative z-10">
                   <ZapIcon className="mr-3 h-6 w-6 text-yellow-400 group-hover:scale-125 transition-transform" />
@@ -82,39 +82,39 @@ export default function Home() {
                 <div className="inline-block bg-white/5 px-4 py-1.5 rounded-full border border-white/10 mb-4">
                   <p className="text-sm font-bold tracking-widest text-slate-300 uppercase">Seamless Processing</p>
                 </div>
-                <h2 className="text-3xl sm:text-4xl font-black text-white">Supported Formats</h2>
+                <h2 className="text-3xl sm:text-4xl font-black text-slate-900">Supported Formats</h2>
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 opacity-90 hover:opacity-100 transition-opacity duration-500">
                  
                  {/* Format 1: PDF */}
-                 <Link href="/pdf/split-merge" className="group relative flex flex-col items-center p-8 sm:p-10 rounded-3xl bg-slate-950/80 border border-white/10 hover:border-red-500/50 hover:bg-slate-900/90 transition-all duration-300 hover:shadow-[0_0_40px_-10px_rgba(239,68,68,0.3)] hover:-translate-y-2 overflow-hidden">
+                 <Link href="/pdf/split-merge" className="group relative flex flex-col items-center p-8 sm:p-10 rounded-3xl bg-white border border-slate-200 hover:border-red-500/50 hover:bg-white transition-all duration-300 hover:shadow-[0_0_40px_-10px_rgba(239,68,68,0.2)] hover:-translate-y-2 overflow-hidden">
                    <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-red-500/20 transition-colors duration-500" />
                    <div className="relative z-10 p-5 rounded-2xl bg-red-500/10 border border-red-500/20 group-hover:bg-red-500/20 transition-colors mb-6 shadow-inner">
                      <FileTextIcon className="w-12 h-12 sm:w-16 sm:h-16 text-red-500" />
                    </div>
-                   <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">PDF</h3>
-                   <p className="text-slate-400 font-medium mt-2 text-center">Portable Document Format</p>
+                   <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">PDF</h3>
+                   <p className="text-slate-500 font-medium mt-2 text-center">Portable Document Format</p>
                  </Link>
                  
                  {/* Format 2: DOCX */}
-                 <Link href="/convert/pdf-to-word" className="group relative flex flex-col items-center p-8 sm:p-10 rounded-3xl bg-slate-950/80 border border-white/10 hover:border-blue-500/50 hover:bg-slate-900/90 transition-all duration-300 hover:shadow-[0_0_40px_-10px_rgba(59,130,246,0.3)] hover:-translate-y-2 overflow-hidden">
+                 <Link href="/convert/pdf-to-word" className="group relative flex flex-col items-center p-8 sm:p-10 rounded-3xl bg-white border border-slate-200 hover:border-blue-500/50 hover:bg-white transition-all duration-300 hover:shadow-[0_0_40px_-10px_rgba(59,130,246,0.2)] hover:-translate-y-2 overflow-hidden">
                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-blue-500/20 transition-colors duration-500" />
                    <div className="relative z-10 p-5 rounded-2xl bg-blue-500/10 border border-blue-500/20 group-hover:bg-blue-500/20 transition-colors mb-6 shadow-inner">
                      <FileTextIcon className="w-12 h-12 sm:w-16 sm:h-16 text-blue-500" />
                    </div>
-                   <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight">DOCX</h3>
-                   <p className="text-slate-400 font-medium mt-2 text-center">Microsoft Word Document</p>
+                   <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">DOCX</h3>
+                   <p className="text-slate-500 font-medium mt-2 text-center">Microsoft Word Document</p>
                  </Link>
 
                  {/* Format 3: JPG/PNG */}
-                 <Link href="/convert/pdf-to-jpg" className="group relative flex flex-col items-center p-8 sm:p-10 rounded-3xl bg-slate-950/80 border border-white/10 hover:border-emerald-500/50 hover:bg-slate-900/90 transition-all duration-300 hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.3)] hover:-translate-y-2 overflow-hidden">
+                 <Link href="/convert/pdf-to-jpg" className="group relative flex flex-col items-center p-8 sm:p-10 rounded-3xl bg-white border border-slate-200 hover:border-emerald-500/50 hover:bg-white transition-all duration-300 hover:shadow-[0_0_40px_-10px_rgba(16,185,129,0.2)] hover:-translate-y-2 overflow-hidden">
                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-emerald-500/20 transition-colors duration-500" />
                    <div className="relative z-10 p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 group-hover:bg-emerald-500/20 transition-colors mb-6 shadow-inner">
                      <ImagePlusIcon className="w-12 h-12 sm:w-16 sm:h-16 text-emerald-500" />
                    </div>
-                   <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-baseline gap-2">JPG <span className="text-xl text-slate-500">/</span> PNG</h3>
-                   <p className="text-slate-400 font-medium mt-2 text-center">Standard Image Formats</p>
+                   <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-baseline gap-2">JPG <span className="text-xl text-slate-300">/</span> PNG</h3>
+                   <p className="text-slate-500 font-medium mt-2 text-center">Standard Image Formats</p>
                  </Link>
                  
               </div>
@@ -128,10 +128,10 @@ export default function Home() {
                <SparklesIcon className="w-4 h-4 text-orange-400" />
                <span className="text-sm font-bold tracking-wider text-slate-300 uppercase">Every Tool You Need</span>
             </div>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-black dark:text-white text-slate-900">🧰 All PDF Tools</h2>
-            <p className="dark:text-slate-400 text-slate-600 text-lg sm:text-xl font-medium max-w-3xl mx-auto px-4">
-              Every tool you need to use PDFs, at your fingertips. All are fully offline, secure, and lightning fast. Merge, split, compress, convert, rotate, unlock and watermark PDFs with just a few clicks.
-            </p>
+             <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900">🧰 All PDF Tools</h2>
+             <p className="text-slate-600 text-lg sm:text-xl font-medium max-w-3xl mx-auto px-4">
+               Every tool you need to use PDFs, at your fingertips. All are fully offline, secure, and lightning fast. Merge, split, compress, convert, rotate, unlock and watermark PDFs with just a few clicks.
+             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
@@ -177,7 +177,7 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 bg-slate-950/90 text-center py-10 relative z-10 px-6">
+      <footer className="border-t border-slate-200 bg-white text-center py-10 relative z-10 px-6">
          <div className="flex justify-center items-center mb-6">
             <div className="flex items-center space-x-2">
               <LockKeyholeIcon className="w-5 h-5 text-slate-500" />
@@ -221,7 +221,7 @@ function ToolCard({ href, title, desc, icon: Icon, color }: { href: string, titl
 
   return (
     <Link href={href} className={`group block focus:outline-none focus:ring-4 ${ringColor} rounded-3xl h-full`}>
-      <Card className={`h-full border border-white/5 dark:bg-slate-900/60 bg-white/60 backdrop-blur-2xl dark:hover:bg-slate-800/80 hover:bg-slate-50 transition-all duration-500 hover:shadow-xl ${shadowColor} hover:-translate-y-2 rounded-3xl overflow-hidden cursor-pointer relative`}>
+      <Card className={`h-full border border-slate-100 bg-white hover:bg-slate-50 transition-all duration-500 hover:shadow-xl ${shadowColor} hover:-translate-y-2 rounded-3xl overflow-hidden cursor-pointer relative`}>
         {isNew && (
           <div className="absolute top-3 right-3 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full z-10 animate-pulse">
             NEW!
@@ -235,8 +235,8 @@ function ToolCard({ href, title, desc, icon: Icon, color }: { href: string, titl
             <Icon className={`h-6 w-6 sm:h-7 sm:w-7 ${textColor}`} />
           </div>
           <div className="space-y-1.5 flex-1 w-full">
-            <h3 className={`text-lg sm:text-xl font-bold dark:text-white text-slate-900 group-hover:${textColor} transition-colors tracking-tight leading-tight`}>{title}</h3>
-            <p className="dark:text-slate-400 text-slate-600 text-sm leading-snug line-clamp-3">{desc}</p>
+            <h3 className={`text-lg sm:text-xl font-bold text-slate-900 group-hover:${textColor} transition-colors tracking-tight leading-tight`}>{title}</h3>
+            <p className="text-slate-500 text-sm leading-snug line-clamp-3">{desc}</p>
           </div>
         </CardContent>
       </Card>
