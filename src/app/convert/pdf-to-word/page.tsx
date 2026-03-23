@@ -3,7 +3,7 @@
 import { useState } from "react";
 import ConversionPage from "@/components/ConversionPage";
 import { FileTextIcon, Settings2Icon } from "lucide-react";
-import type { Paragraph as DocxParagraph } from "docx";
+import type { Paragraph as DocxParagraph, TextRun as DocxTextRun } from "docx";
 
 export default function PdfToWord() {
   const [selectedLang, setSelectedLang] = useState("eng");
@@ -20,11 +20,20 @@ export default function PdfToWord() {
     let t = raw.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uD800-\uDFFF\uFFFE\uFFFF]/g, "");
     t = t.normalize('NFC');
 
-    // 2. Hindi-specific restoration logic
+    // 2. Aggressive Hindi-specific restoration logic
     if (selectedLang.includes('hin')) {
-      t = t.replace(/([\u0915-\u0939])\s+([\u0901-\u094D\u0962-\u0963])/g, "$1$2");
+      // Join broken characters: "क ् या" -> "क्या"
+      t = t.replace(/([\u0915-\u0939])\s+([\u093C\u094D\u0901\u0902\u0903])/g, "$1$2");
+      // Join Matras that got separated: "क ा" -> "का"
+      t = t.replace(/([\u0915-\u0939])\s+([\u093E-\u094C])/g, "$1$2");
+      // Re-order Short-I (if separated)
       t = t.replace(/([\u093F])\s*([\u0905-\u0939])/g, '$2$1');
-      t = t.replace(/([\u094D])\s+([\u0905-\u0939])/g, '$1$2');
+      // Merge multiple spaces into one
+      t = t.replace(/\s+/g, ' ');
+      // Join Halants with next consonant: "क् य" -> "क्य"
+      t = t.replace(/([\u094D])\s+([\u0915-\u0939])/g, '$1$2');
+      // Remove spaces between any two Hindi characters to restore the top bar
+      // but preserve spaces between words (detecting word boundaries is hard, so we join conservatively)
       t = t.replace(/([\u0900-\u097F])\s([\u093E-\u094F\u093C\u0902\u0903\u094D])/g, '$1$2');
 
       if (stripEnglish) {
@@ -103,10 +112,13 @@ export default function PdfToWord() {
               new TextRun({ 
                 text: cleaned, 
                 size: 24, 
-                font: { 
-                  name: selectedLang.includes('hin') ? "Nirmala UI, Mangal, Arial Unicode MS" : "Arial", 
-                  hint: "default" 
-                } 
+                font: selectedLang.includes('hin') ? { 
+                  name: "Nirmala UI", 
+                  cs: "Nirmala UI",
+                  hint: "cs" 
+                } : {
+                  name: "Arial"
+                }
               })
             ],
             spacing: { before: 120, line: 360 }
