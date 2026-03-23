@@ -16,8 +16,8 @@ export default function PdfToWord() {
    * Strips control characters that corrupt DOCX files.
    */
   const sanitizeAndRecon = (raw: string) => {
-    // 1. Strict XML Sanitization (Removes non-printable control characters)
-    let t = raw.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uD800-\uDFFF\uFFFE\uFFFF]/g, "");
+    // 1. Strict XML Sanitization + PUA Stripping (Removes binary noise & boxes)
+    let t = raw.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uD800-\uDFFF\uFFFE\uFFFF\uE000-\uF8FF\u25CC\u25A1]/g, "");
     t = t.normalize('NFC');
 
     // 2. Aggressive Hindi-specific restoration logic
@@ -61,7 +61,11 @@ export default function PdfToWord() {
     // Initialize 2 parallel workers for performance
     for (let j = 0; j < 2; j++) {
       const worker = await createWorker(selectedLang, 1);
-      await worker.setParameters({ tessedit_pageseg_mode: 6 as any });
+      const params: any = { tessedit_pageseg_mode: 6 as any };
+      if (selectedLang.includes('hin')) {
+        params.tessedit_char_whitelist = "0123456789अआइईउऊऋएऐओऔकखगघङचछजझञटठडढणतथदधनपफबभमयरलवशषसह़ािीुूृेैोौ्॒॑॓॔क़ख़ग़ज़ड़ढ़फ़।.-,() ";
+      }
+      await worker.setParameters(params);
       scheduler.addWorker(worker);
     }
     
@@ -115,7 +119,6 @@ export default function PdfToWord() {
                 font: selectedLang.includes('hin') ? { 
                   name: "Mangal", 
                   cs: "Mangal",
-                  eastAsia: "Nirmala UI, Kokila",
                   hint: "cs" 
                 } : {
                   name: "Arial"
