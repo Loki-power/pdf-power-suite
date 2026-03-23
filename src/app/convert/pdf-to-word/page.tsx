@@ -8,17 +8,18 @@ export default function PdfToWord() {
   const [selectedLang, setSelectedLang] = useState("eng");
   const [stripEnglish, setStripEnglish] = useState(false);
   
-  const VERSION = "6.0 (SPLICED-RECON)";
+  const VERSION = "7.0 (PARALLEL-CORE)";
 
   /**
-   * SPLICED-RECON v6.0 ENGINE
-   * Multi-language OCR and script restoration.
+   * XML Sanitizer & Script-Recon v7.0
+   * Strips control characters that corrupt DOCX files.
    */
-  const scriptReconV6 = (raw: string) => {
-    let t = raw.normalize('NFC')
-             .replace(/[\u25A1\u25CC\u25CB\uFFFD\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
+  const sanitizeAndRecon = (raw: string) => {
+    // 1. Strict XML Sanitization (Removes non-printable control characters)
+    let t = raw.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uD800-\uDFFF\uFFFE\uFFFF]/g, "");
+    t = t.normalize('NFC');
 
-    // Hindi-specific restoration logic
+    // 2. Hindi-specific restoration logic
     if (selectedLang.includes('hin')) {
       t = t.replace(/([\u0915-\u0939])\s+([\u0901-\u094D\u0962-\u0963])/g, "$1$2");
       t = t.replace(/([\u093F])\s*([\u0905-\u0939])/g, '$2$1');
@@ -33,7 +34,7 @@ export default function PdfToWord() {
   };
 
   const processFile = async (file: File, setProgress: (status: string, value: number) => void, addLog: (msg: string) => void) => {
-    addLog(`Activating ${selectedLang.toUpperCase()} OCR Matrix...`);
+    addLog(`Activating Parallel OCR Core (${selectedLang.toUpperCase()})...`);
     
     const { Document, Packer, Paragraph, TextRun } = await import("docx");
     // @ts-ignore
@@ -43,66 +44,82 @@ export default function PdfToWord() {
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) }).promise;
     
-    const { createWorker } = await import("tesseract.js");
-    addLog(`Initializing Global Language Hub...`);
-    const worker = await createWorker(selectedLang, 1);
+    const { createWorker, createScheduler } = await import("tesseract.js");
+    const scheduler = createScheduler();
     
-    const sections = [];
+    addLog(`Initializing Multi-Worker Cluster...`);
+    // Initialize 2 parallel workers for performance
+    for (let j = 0; j < 2; j++) {
+      const worker = await createWorker(selectedLang, 1);
+      await worker.setParameters({ tessedit_pageseg_mode: 6 as any });
+      scheduler.addWorker(worker);
+    }
+    
+    // Preparation Phase
+    const pageBlobs: Blob[] = [];
+    addLog(`Rasterizing ${pdf.numPages} pages...`);
+    
     for (let i = 1; i <= pdf.numPages; i++) {
-        const prog = Math.round((i / pdf.numPages) * 100);
-        setProgress(`Splicing Page ${i}/${pdf.numPages}`, prog);
-        
         const page = await pdf.getPage(i);
-        const viewport = page.getViewport({ scale: 4.0 });
-        
+        const viewport = page.getViewport({ scale: 2.5 }); // Optimized scale for speed
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
         canvas.height = viewport.height;
         canvas.width = viewport.width;
         
-        const pageParagraphs: any[] = [];
-        
         if (ctx) {
           await page.render({ canvasContext: ctx as any, viewport: viewport }).promise;
-          
           const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           const d = imgData.data;
           for (let k = 0; k < d.length; k += 4) {
-            const gray = 0.299 * d[k] + 0.587 * d[k + 1] + 0.114 * d[k + 2];
-            const v = gray > 190 ? 255 : 0; 
-            d[k] = d[k + 1] = d[k + 2] = v;
+             const gray = 0.299 * d[k] + 0.587 * d[k + 1] + 0.114 * d[k + 2];
+             const v = gray > 190 ? 255 : 0; 
+             d[k] = d[k + 1] = d[k + 2] = v;
           }
           ctx.putImageData(imgData, 0, 0);
+          const blob = await new Promise<Blob>((res) => canvas.toBlob(b => res(b!), "image/png"));
+          pageBlobs.push(blob);
+        }
+    }
 
-          const blob = await new Promise<Blob>((resolve) => canvas.toBlob(b => resolve(b!), "image/png"));
-          
-          await worker.setParameters({ tessedit_pageseg_mode: 6 as any });
-          const { data: { text } } = await worker.recognize(blob);
-          
-          text.split('\n').forEach((line: string) => {
-            const cleaned = scriptReconV6(line);
-            if (cleaned) {
-              pageParagraphs.push(
-                new Paragraph({
-                  children: [
-                    new TextRun({ 
-                      text: cleaned, 
-                      size: 24, 
-                      font: { name: selectedLang.includes('hin') ? "Noto Sans Devanagari" : "Inter", hint: "default" } 
-                    })
-                  ],
-                  spacing: { before: 200, line: 400 }
-                })
-              );
-            }
+    addLog("Executing Parallel OCR Splicing...");
+    const results = await Promise.all(pageBlobs.map(async (blob, idx) => {
+      const { data: { text } } = await scheduler.addJob('recognize', blob) as any;
+      const prog = Math.round(((idx + 1) / pdf.numPages) * 100);
+      setProgress(`Analyzing Page ${idx+1}/${pdf.numPages}`, prog);
+      return text;
+    }));
+
+    await scheduler.terminate();
+
+    addLog("Constructing High-Integrity DOCX Binary...");
+    const wordSections = results.map((text: string) => {
+      const paragraphs = text.split('\n').map((line: string) => {
+        const cleaned = sanitizeAndRecon(line);
+        if (cleaned) {
+          return new Paragraph({
+            children: [
+              new TextRun({ 
+                text: cleaned, 
+                size: 24, 
+                font: { name: selectedLang.includes('hin') ? "Noto Sans Devanagari" : "Arial", hint: "default" } 
+              })
+            ],
+            spacing: { before: 120, line: 360 }
           });
         }
-        
-        sections.push({ children: pageParagraphs });
-    }
-    
-    await worker.terminate();
-    const doc = new Document({ sections });
+        return null;
+      }).filter(Boolean) as Paragraph[];
+
+      // Fallback for empty pages
+      if (paragraphs.length === 0) {
+        paragraphs.push(new Paragraph({ children: [new TextRun({ text: " " })] }));
+      }
+
+      return { children: paragraphs };
+    });
+
+    const doc = new Document({ sections: wordSections });
     const wordBlob = await Packer.toBlob(doc);
     
     return {
@@ -135,7 +152,7 @@ export default function PdfToWord() {
   return (
     <ConversionPage
       title="PDF to Word"
-      subtitle="Next-gen multi-language OCR engine. Specialized script restoration for Hindi, English, and complex global scripts with pixel-perfect accuracy."
+      subtitle="Parallel-Core OCR engine. Optimized for speed and structural integrity with expert-grade global script restoration."
       targetFormat="Word DOCX"
       accentColor="orange"
       icon={FileTextIcon}
