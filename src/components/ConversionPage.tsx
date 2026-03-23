@@ -27,6 +27,7 @@ interface ConversionPageProps {
   accept: string;
   onConvert: (file: File, setProgress: (status: string, value: number) => void, addLog: (msg: string) => void) => Promise<{ url: string; name: string }>;
   options?: ReactNode;
+  initialOptions?: ReactNode;
   version?: string;
 }
 
@@ -39,6 +40,7 @@ export default function ConversionPage({
   accept,
   onConvert,
   options,
+  initialOptions,
   version
 }: ConversionPageProps) {
   const [file, setFile] = useState<File | null>(null);
@@ -126,10 +128,14 @@ export default function ConversionPage({
               <span>{version}</span>
             </div>
           )}
-          <h1 className="text-5xl sm:text-7xl font-black tracking-tighter text-slate-900">
-            {title.split(" to ")[0]} to <span className={textClass}>{title.split(" to ")[1]}</span>
+          <h1 className="text-5xl sm:text-7xl font-black tracking-tighter text-slate-900 leading-[1.1]">
+            {title.includes(" to ") ? (
+              <>
+                {title.split(" to ")[0]} to <span className={textClass}>{title.split(" to ")[1]}</span>
+              </>
+            ) : title}
           </h1>
-          <p className="text-slate-600 text-lg sm:text-xl max-w-2xl mx-auto font-medium leading-relaxed">
+          <p className="text-slate-600 text-lg sm:text-xl max-w-2xl mx-auto font-medium leading-relaxed pb-4">
             {subtitle}
           </p>
         </div>
@@ -152,6 +158,13 @@ export default function ConversionPage({
                   <ArrowRightIcon className="h-3 w-3" />
                   <span>Accepts {accept.toUpperCase()}</span>
                 </div>
+                
+                {initialOptions && (
+                  <div className="mt-12 w-full max-w-xl mx-auto" onClick={(e) => e.stopPropagation()}>
+                    <div className="h-[2px] w-12 bg-slate-200 mx-auto mb-8" />
+                    {initialOptions}
+                  </div>
+                )}
               </div>
             ) : (
               <div className="p-8 sm:p-12 space-y-10">
