@@ -3,6 +3,7 @@
 import { useState } from "react";
 import ConversionPage from "@/components/ConversionPage";
 import { FileTextIcon, Settings2Icon } from "lucide-react";
+import type { Paragraph as DocxParagraph } from "docx";
 
 export default function PdfToWord() {
   const [selectedLang, setSelectedLang] = useState("eng");
@@ -112,7 +113,7 @@ export default function PdfToWord() {
           });
         }
         return null;
-      }).filter(Boolean) as Paragraph[];
+      }).filter(Boolean) as DocxParagraph[];
 
       // Fallback for empty pages
       if (paragraphs.length === 0) {
