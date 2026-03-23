@@ -5,18 +5,23 @@ import { DatabaseIcon } from "lucide-react";
 
 export default function ExcelToPdf() {
   const processFile = async (file: File, setProgress: (status: string, value: number) => void, addLog: (msg: string) => void) => {
-    addLog("Initializing Spreadsheet-to-PDF Engine...");
+    addLog("Initializing Spreadsheet-to-PDF Stealth Engine v2.1...");
     
     const ExcelJS = await import("exceljs");
     const { jsPDF } = await import("jspdf");
     
-    addLog("loading Excel Binary...");
+    addLog("Parsing Spreadsheet Binary...");
     const arrayBuffer = await file.arrayBuffer();
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(arrayBuffer);
     
     const worksheet = workbook.getWorksheet(1); 
-    if (!worksheet) throw new Error("No worksheet found in Excel file.");
+    if (!worksheet) throw new Error("No worksheet identified in the uploaded Excel file.");
+
+    addLog("Synchronizing System Fonts...");
+    if (typeof document !== 'undefined' && (document as any).fonts) {
+        await (document as any).fonts.ready;
+    }
 
     addLog("Mapping Spreadsheet Matrix...");
     setProgress("Reconstructing Table", 40);
@@ -51,7 +56,6 @@ export default function ExcelToPdf() {
           const val = cell.value;
           if (val !== null && val !== undefined) {
             if (typeof val === 'object') {
-              // Handle ExcelJS Formula, RichText, or Hyperlink objects
               cellValue = (val as any).result?.toString() ?? 
                           (val as any).richText?.map((rt: any) => rt.text).join('') ?? 
                           (val as any).text?.toString() ?? 
@@ -70,18 +74,24 @@ export default function ExcelToPdf() {
       table.appendChild(tr);
     });
 
+    // STEALTH-RENDER CONTAINER (v2.1)
+    // Absolute positioning + zero opacity ensures zero-layout-skip capture
     const container = document.createElement('div');
+    container.id = "excel-to-pdf-stealth-zone";
     container.style.width = '800px'; 
     container.style.padding = '40px';
     container.style.backgroundColor = 'white';
-    container.style.position = 'fixed';
-    container.style.left = '-10000px';
+    container.style.position = 'absolute';
+    container.style.left = '0';
     container.style.top = '0';
+    container.style.zIndex = '-9999';
+    container.style.opacity = '0';
+    container.style.pointerEvents = 'none';
     container.appendChild(table);
     document.body.appendChild(container);
 
-    addLog("Rendering High-Fidelity PDF Layer...");
-    setProgress("Capturing Visuals", 70);
+    addLog("Capturing High-Fidelity PDF Layer...");
+    setProgress("Visual Synthesis", 70);
 
     return new Promise<{ url: string; name: string }>((resolve, reject) => {
       doc.html(container, {
@@ -89,6 +99,8 @@ export default function ExcelToPdf() {
           scale: 2,
           useCORS: true,
           logging: false,
+          scrollX: 0,
+          scrollY: 0
         },
         margin: [30, 30, 30, 30],
         autoPaging: 'text',
@@ -97,14 +109,18 @@ export default function ExcelToPdf() {
         width: 535,
         windowWidth: 800,
         callback: function (doc) {
-          const pdfBytes = doc.output('arraybuffer');
-          const blob = new Blob([pdfBytes], { type: "application/pdf" });
-          document.body.removeChild(container);
-          addLog("Spreadsheet Visualization Complete.");
-          resolve({
-            url: URL.createObjectURL(blob),
-            name: `${file.name.split('.')[0]}.pdf`
-          });
+          try {
+            const pdfBytes = doc.output('arraybuffer');
+            const blob = new Blob([pdfBytes], { type: "application/pdf" });
+            document.body.removeChild(container);
+            addLog("Spreadsheet Visualization Complete.");
+            resolve({
+              url: URL.createObjectURL(blob),
+              name: `${file.name.split('.')[0]}.pdf`
+            });
+          } catch (err) {
+            reject(err);
+          }
         }
       });
     });
@@ -113,7 +129,7 @@ export default function ExcelToPdf() {
   return (
     <ConversionPage
       title="Excel to PDF"
-      subtitle="Convert your Excel spreadsheets into clean, professional PDFs. Perfect for reports and sharing data reliably."
+      subtitle="Stealth-Render v2.1 Engine. Professional Grade PDF extraction for spreadsheets and macro-enabled workbooks."
       targetFormat="PDF Document"
       accentColor="emerald"
       icon={DatabaseIcon}
