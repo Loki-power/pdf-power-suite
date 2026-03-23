@@ -9,11 +9,11 @@ export default function PdfToWord() {
   const [selectedLang, setSelectedLang] = useState("eng");
   const [stripEnglish, setStripEnglish] = useState(false);
   
-  const VERSION = "14.0 (SEMANTIC-PUNCTUATION)";
+  const VERSION = "16.0 (FIDELITY-PLUS)";
 
   /**
-   * SCRIPT-RECON v14.0 (SEMANTIC-PUNCTUATION)
-   * High-accuracy reconstruction with intelligent punctuation formatting.
+   * SCRIPT-RECON v16.0 (FIDELITY-PLUS)
+   * High-res reconstruction with linguistic nasalization correction.
    */
   const sanitizeAndRecon = (raw: string) => {
     // 1. Basic XML/PUA Sanitation
@@ -32,11 +32,14 @@ export default function PdfToWord() {
       // Rule C: Fix Halant-Conjunctions
       t = t.replace(/([\u094D])\s+([\u0915-\u0939])/g, '$1$2');
 
-      // SEMANTIC PUNCTUATION LAYER (Hindi Context)
-      // Fix Danda positioning
+      // SEMANTIC PUNCTUATION & NASALIZATION v16.0
       t = t.replace(/\s+(।)/g, '$1');
-      // Replace trailing dots with Danda in Hindi lines
       t = t.replace(/([^\d\w])\.(?=\s|$)/g, '$1।');
+      
+      // Nasalization Correction (Catch common lost dots)
+      t = t.replace(/\bनही\b/g, 'नहीं');
+      t = t.replace(/\bमै\b/g, 'मैं');
+      t = t.replace(/\bहै\b(?=\s+[।?])/g, 'हैं'); // Heuristic for plural/respectful endings
 
       t = t.normalize('NFC');
 
@@ -86,7 +89,7 @@ export default function PdfToWord() {
 
       // WHITELIST EXPANSION v14.0: Includes full technical and Hindi punctuation
       if (selectedLang.includes('hin')) {
-        params.tessedit_char_whitelist = "0123456789अआइईउऊऋएऐओऔकखगघङचछजझञटठडढणतथदधनपफबभमयरलवशषसह़ािीुूृेैोौ्॒॑॓॔क़ख़ग़ज़ड़ढ़फ़।.,!?;:'\"[]{}#&*@=/_() ";
+        params.tessedit_char_whitelist = "0123456789अआइईउऊऋएऐओऔकखगघङचछजझञटठडढणतथदधनपफबभमयरलवशषसहँंः़ािीुूृॅेैॉोौ्॒॑॓॔क़ख़ग़ज़ड़ढ़फ़।.,!?;:'\"[]{}#&*@=/_() ";
       } else {
         params.tessedit_char_whitelist = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?;:'\"[]{}#&*@=/_()+-/*% ";
       }
@@ -96,9 +99,9 @@ export default function PdfToWord() {
     }
     
     const pageBlobs: Blob[] = [];
-    const renderScale = isPureHindi ? 3.5 : (isHybrid ? 3.0 : 2.0);
+    const renderScale = isPureHindi ? 4.0 : (isHybrid ? 3.0 : 2.0);
     
-    addLog(`Precise Scanning (${renderScale}x)...`);
+    addLog(`Fidelity-Plus Scanning (${renderScale}x)...`);
     
     for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
@@ -132,8 +135,8 @@ export default function PdfToWord() {
           } else {
             for (let k = 0; k < d.length; k += 4) {
                let avg = (d[k] + d[k+1] + d[k+2]) / 3;
-               avg = (avg - 128) * 1.8 + 128;
-               const v = avg > 170 ? 255 : 0; 
+               avg = (avg - 128) * 2.2 + 128; // Increased contrast for small dots
+               const v = avg > 162 ? 255 : 0; 
                d[k] = d[k+1] = d[k+2] = v;
             }
           }
