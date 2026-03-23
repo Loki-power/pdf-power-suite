@@ -71,8 +71,8 @@ export default function PdfToWord() {
       // GLOBAL DICTIONARY BINDING: Absolute paths for absolute accuracy
       const params: any = { 
         tessedit_pageseg_mode: 3 as any,
-        user_words_suffix: isEnglish ? 'technical_words.txt' : 'hindi_words.txt',
-        user_patterns_suffix: 'hindi_patterns.txt'
+        user_words_suffix: isEnglish ? '/technical_words.txt' : '/hindi_words.txt',
+        user_patterns_suffix: '/hindi_patterns.txt'
       };
 
       if (selectedLang.includes('hin')) {

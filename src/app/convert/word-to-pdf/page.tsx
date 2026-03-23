@@ -5,84 +5,101 @@ import { FileTextIcon } from "lucide-react";
 
 export default function WordToPdf() {
   const processFile = async (file: File, setProgress: (status: string, value: number) => void, addLog: (msg: string) => void) => {
-    addLog("Initializing High-Stab Word-to-PDF Core v2.0...");
+    addLog("Initializing Stealth-Render Word-to-PDF Core v2.1...");
     
     const mammoth = await import("mammoth");
     const { jsPDF } = await import("jspdf");
     
-    addLog("Extracting OpenXML Semantic Layer...");
+    addLog("Extracting Document Semantics...");
     const arrayBuffer = await file.arrayBuffer();
     
-    setProgress("Synthesizing HTML Structure", 30);
+    setProgress("Analyzing OpenXML", 30);
     const result = await mammoth.convertToHtml({ arrayBuffer });
     const html = result.value; 
 
     if (!html) {
-        addLog("Warning: Document structure appears sparse.");
+        throw new Error("The Word document appears to be empty or corrupted.");
     }
     
-    addLog("Isolating Layout Matrix...");
-    setProgress("Rasterizing PDF Frames", 60);
+    addLog("Constructing High-Fidelity Shadow DOM...");
+    setProgress("Synchronizing Fonts", 50);
     
+    // Wait for system fonts to be ready for capture
+    if (typeof document !== 'undefined' && (document as any).fonts) {
+        await (document as any).fonts.ready;
+    }
+
     const doc = new jsPDF({
       orientation: 'p',
       unit: 'pt',
       format: 'a4'
     });
 
-    // PAPER-SIM CONTAINER: Forces Word-like isolation
+    // STEALTH-RENDER CONTAINER (v2.1)
+    // Avoids -10000px which causes blank captures in some browsers.
+    // Uses absolute positioning and zero opacity instead.
     const container = document.createElement('div');
-    container.id = "word-to-pdf-paper-sim";
-    container.className = "prose prose-sm max-w-none"; // Tailwind-like semantic defaults
-    container.style.width = '595pt'; // A4 Width in PT
-    container.style.padding = '72pt'; // 1 inch margins
+    container.id = "word-to-pdf-capture-zone";
+    container.style.width = '595pt'; 
+    container.style.padding = '72pt'; 
     container.style.backgroundColor = 'white';
     container.style.color = 'black';
-    container.style.position = 'fixed';
-    container.style.left = '-10000px';
+    container.style.position = 'absolute';
+    container.style.left = '0';
     container.style.top = '0';
-    container.style.fontFamily = "'Times New Roman', Times, serif";
-    container.style.lineHeight = "1.5";
+    container.style.zIndex = '-9999';
+    container.style.opacity = '0';
+    container.style.pointerEvents = 'none';
+    container.style.fontFamily = "'Times New Roman', serif";
+    container.style.lineHeight = "1.6";
     container.innerHTML = html;
     document.body.appendChild(container);
 
-    // Apply basic semantic styling to the isolated HTML
     const styles = document.createElement('style');
     styles.innerHTML = `
-      #word-to-pdf-paper-sim h1 { font-size: 24pt; font-weight: bold; margin-bottom: 20pt; }
-      #word-to-pdf-paper-sim h2 { font-size: 18pt; font-weight: bold; margin-bottom: 15pt; }
-      #word-to-pdf-paper-sim p { font-size: 11pt; margin-bottom: 10pt; text-align: justify; }
-      #word-to-pdf-paper-sim table { width: 100%; border-collapse: collapse; margin-bottom: 20pt; }
-      #word-to-pdf-paper-sim td, #word-to-pdf-paper-sim th { border: 1pt solid #ccc; padding: 5pt; }
+      #word-to-pdf-capture-zone h1 { font-size: 26pt; font-weight: bold; margin-bottom: 24pt; text-align: center; }
+      #word-to-pdf-capture-zone h2 { font-size: 20pt; font-weight: bold; margin-bottom: 18pt; border-bottom: 1pt solid #eee; }
+      #word-to-pdf-capture-zone p { font-size: 12pt; margin-bottom: 12pt; text-align: justify; }
+      #word-to-pdf-capture-zone table { width: 100%; border-collapse: collapse; margin-bottom: 24pt; }
+      #word-to-pdf-capture-zone td, #word-to-pdf-capture-zone th { border: 1pt solid #ddd; padding: 8pt; vertical-align: top; }
+      #word-to-pdf-capture-zone img { max-width: 100%; height: auto; display: block; margin: 20pt auto; }
     `;
     container.appendChild(styles);
 
+    addLog("Capturing Document Vectors...");
+    setProgress("Generating PDF Binary", 80);
+
     return new Promise<{ url: string; name: string }>((resolve, reject) => {
-      addLog("Executing Vector Transcription...");
       doc.html(container, {
         html2canvas: {
-          scale: 1, // High-stab 1x (v2.0)
+          scale: 1, 
           useCORS: true,
           logging: false,
           letterRendering: true,
+          scrollX: 0,
+          scrollY: 0
         },
-        margin: [0, 0, 0, 0], // Margins handled by container padding
+        margin: [0, 0, 0, 0],
         autoPaging: 'text',
         x: 0,
         y: 0,
         width: 595,
         windowWidth: 595,
         callback: function (doc) {
-          const pdfBytes = doc.output('arraybuffer');
-          const blob = new Blob([pdfBytes], { type: "application/pdf" });
-          
-          document.body.removeChild(container);
-          addLog("Transcription Finalized.");
-          
-          resolve({
-            url: URL.createObjectURL(blob),
-            name: `${file.name.split('.')[0]}.pdf`
-          });
+          try {
+            const pdfBytes = doc.output('arraybuffer');
+            const blob = new Blob([pdfBytes], { type: "application/pdf" });
+            
+            document.body.removeChild(container);
+            addLog("Conversion Successfully Completed.");
+            
+            resolve({
+              url: URL.createObjectURL(blob),
+              name: `${file.name.split('.')[0]}.pdf`
+            });
+          } catch (err) {
+            reject(err);
+          }
         }
       });
     });
@@ -91,7 +108,7 @@ export default function WordToPdf() {
   return (
     <ConversionPage
       title="Word to PDF"
-      subtitle="Enhanced v2.0 Layout Engine. High-fidelity Word document rendering with semantic preservation."
+      subtitle="Stealth-Render v2.1 Engine. High-fidelity rendering with automatic overflow and image synchronization."
       targetFormat="PDF Document"
       accentColor="emerald"
       icon={FileTextIcon}
