@@ -45,7 +45,26 @@ export default function ExcelToPdf() {
         const td = document.createElement('td');
         td.style.border = '1px solid #e5e7eb';
         td.style.padding = '8px';
-        td.innerText = cell.text || '';
+        
+        let cellValue = "";
+        try {
+          const val = cell.value;
+          if (val !== null && val !== undefined) {
+            if (typeof val === 'object') {
+              // Handle ExcelJS Formula, RichText, or Hyperlink objects
+              cellValue = (val as any).result?.toString() ?? 
+                          (val as any).richText?.map((rt: any) => rt.text).join('') ?? 
+                          (val as any).text?.toString() ?? 
+                          String(val);
+            } else {
+              cellValue = String(val);
+            }
+          }
+        } catch (e) {
+          cellValue = "[Error]";
+        }
+        
+        td.innerText = cellValue;
         tr.appendChild(td);
       });
       table.appendChild(tr);
@@ -98,7 +117,7 @@ export default function ExcelToPdf() {
       targetFormat="PDF Document"
       accentColor="emerald"
       icon={DatabaseIcon}
-      accept=".xlsx"
+      accept=".xlsx,.xlsm"
       onConvert={processFile}
     />
   );

@@ -5,12 +5,12 @@ import { PresentationIcon } from "lucide-react";
 
 export default function PptToPdf() {
   const processFile = async (file: File, setProgress: (status: string, value: number) => void, addLog: (msg: string) => void) => {
-    addLog("Initializing PPT-to-PDF Transcription Engine...");
+    addLog("Initializing High-Fidelity PPT Transcription Engine...");
     
     const JSZip = (await import("jszip")).default;
     const { jsPDF } = await import("jspdf");
     
-    addLog("Unpacking Presentation Archive...");
+    addLog("Analyzing Presentation Structure...");
     const arrayBuffer = await file.arrayBuffer();
     const zip = await JSZip.loadAsync(arrayBuffer);
     
@@ -29,46 +29,87 @@ export default function PptToPdf() {
 
     if (slideFiles.length === 0) throw new Error("No presentation slides identified.");
 
-    addLog(`Identified ${slideFiles.length} slides for transcription.`);
-    
+    // Attempt to get slide size from presentation.xml
+    let slideWidth = 720; // Default points
+    let slideHeight = 540;
+    try {
+      const presXml = await zip.file("ppt/presentation.xml")?.async("string");
+      if (presXml) {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(presXml, "text/xml");
+        const sldSz = xmlDoc.getElementsByTagName("p:sldSz")[0];
+        if (sldSz) {
+          const cx = parseInt(sldSz.getAttribute("cx") || "9144000");
+          const cy = parseInt(sldSz.getAttribute("cy") || "6858000");
+          slideWidth = (cx / 12700); // EMU to points
+          slideHeight = (cy / 12700);
+        }
+      }
+    } catch (e) {
+      addLog("Scaling using standard 4:3 profile...");
+    }
+
     const doc = new jsPDF({
-      orientation: 'l',
+      orientation: slideWidth > slideHeight ? 'l' : 'p',
       unit: 'pt',
-      format: 'a4'
+      format: [slideWidth, slideHeight]
     });
+
+    const parser = new DOMParser();
 
     for (let i = 0; i < slideFiles.length; i++) {
         const prog = Math.round(((i + 1) / slideFiles.length) * 100);
-        setProgress(`Transcribing Slide ${i + 1}/${slideFiles.length}`, prog);
+        setProgress(`Mapping Slide ${i + 1}/${slideFiles.length}`, prog);
         
-        const slideXml = await slideFiles[i].file.async("string");
-        const textRegex = /<a:t>([^<]*)<\/a:t>/g;
-        let tMatch;
-        const slideText: string[] = [];
-        while ((tMatch = textRegex.exec(slideXml)) !== null) {
-            if (tMatch[1].trim()) slideText.push(tMatch[1].replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>'));
-        }
+        const slideXmlStr = await slideFiles[i].file.async("string");
+        const slideXml = parser.parseFromString(slideXmlStr, "text/xml");
+        
+        if (i > 0) doc.addPage([slideWidth, slideHeight], slideWidth > slideHeight ? 'l' : 'p');
 
-        if (i > 0) doc.addPage();
-        
-        doc.setFontSize(24);
-        doc.setTextColor(50, 50, 50);
-        doc.text(`Slide ${i + 1}`, 40, 60);
-        
-        doc.setFontSize(14);
-        doc.setTextColor(80, 80, 80);
-        
-        let yOffset = 100;
-        for (const text of slideText) {
-            const lines = doc.splitTextToSize(text, 750);
-            doc.text(lines, 60, yOffset);
-            yOffset += (lines.length * 20) + 15;
-            if (yOffset > 520) break;
+        // Extract shapes and their text with spatial awareness
+        const shapes = slideXml.getElementsByTagName("p:sp");
+        for (let j = 0; j < shapes.length; j++) {
+            const shape = shapes[j];
+            
+            // 1. Get Position (EMUs to Points)
+            const off = shape.getElementsByTagName("a:off")[0];
+            const ext = shape.getElementsByTagName("a:ext")[0];
+            
+            if (!off || !ext) continue;
+            
+            const x = parseInt(off.getAttribute("x") || "0") / 12700;
+            const y = parseInt(off.getAttribute("y") || "0") / 12700;
+            const w = parseInt(ext.getAttribute("cx") || "0") / 12700;
+            const h = parseInt(ext.getAttribute("cy") || "0") / 12700;
+
+            // 2. Extract Text with Paragraph Awareness
+            const paragraphs = shape.getElementsByTagName("a:p");
+            let yOffset = y;
+            
+            for (let k = 0; k < paragraphs.length; k++) {
+              const p = paragraphs[k];
+              const textNodes = p.getElementsByTagName("a:t");
+              let pText = "";
+              for (let l = 0; l < textNodes.length; l++) {
+                pText += textNodes[l].textContent || "";
+              }
+
+              if (pText.trim()) {
+                // Determine alignment and basic sizing
+                const isTitle = j === 0 || pText.length < 50; 
+                doc.setFontSize(isTitle ? 22 : 14);
+                doc.setTextColor(isTitle ? 40 : 80, isTitle ? 40 : 80, isTitle ? 40 : 80);
+                
+                const lines = doc.splitTextToSize(pText, w > 0 ? w : (slideWidth - 80));
+                doc.text(lines, x > 0 ? x : 40, yOffset + 20);
+                yOffset += (lines.length * (isTitle ? 26 : 16));
+              }
+            }
         }
-        addLog(`Processed Slide ${i + 1} content.`);
+        addLog(`Synchronized Slide ${i + 1}.`);
     }
     
-    addLog("Finalizing PDF Presentation Binary...");
+    addLog("Synthesizing Final PDF Binary...");
     const pdfBytes = doc.output('arraybuffer');
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
     
@@ -81,7 +122,7 @@ export default function PptToPdf() {
   return (
     <ConversionPage
       title="PowerPoint to PDF"
-      subtitle="Convert your PowerPoint presentations into high-fidelity PDF documents. Preserves text and slide order perfectly."
+      subtitle="Spatial-Aware PPT conversion. Preserves layout, positioning, and text hierarchy for a professional result."
       targetFormat="PDF Presentation"
       accentColor="orange"
       icon={PresentationIcon}
