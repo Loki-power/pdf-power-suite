@@ -5,26 +5,26 @@ import { DatabaseIcon } from "lucide-react";
 
 export default function ExcelToPdf() {
   const processFile = async (file: File, setProgress: (status: string, value: number) => void, addLog: (msg: string) => void) => {
-    addLog("Initializing Spreadsheet-to-PDF Stealth Engine v2.1...");
+    addLog("Activating Spreadsheet-to-PDF Ultra-Stab Engine v2.5...");
     
     const ExcelJS = await import("exceljs");
     const { jsPDF } = await import("jspdf");
     
-    addLog("Parsing Spreadsheet Binary...");
+    addLog("Parsing Workbook Binary...");
     const arrayBuffer = await file.arrayBuffer();
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(arrayBuffer);
     
     const worksheet = workbook.getWorksheet(1); 
-    if (!worksheet) throw new Error("No worksheet identified in the uploaded Excel file.");
+    if (!worksheet) throw new Error("No active worksheet found in the document.");
 
-    addLog("Synchronizing System Fonts...");
+    addLog("Synchronizing Rendering Environment...");
     if (typeof document !== 'undefined' && (document as any).fonts) {
         await (document as any).fonts.ready;
     }
 
-    addLog("Mapping Spreadsheet Matrix...");
-    setProgress("Reconstructing Table", 40);
+    addLog("Reconstructing Geometric Matrix...");
+    setProgress("Mapping Cells", 40);
     
     const doc = new jsPDF({
       orientation: 'p',
@@ -35,49 +35,60 @@ export default function ExcelToPdf() {
     const table = document.createElement('table');
     table.style.borderCollapse = 'collapse';
     table.style.width = '100%';
-    table.style.fontSize = '9pt';
+    table.style.fontSize = '8.5pt';
     table.style.fontFamily = 'sans-serif';
-    table.style.color = '#374151';
+    table.style.color = '#1f2937';
 
-    worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+    worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
+      if (!row) return;
+      
       const tr = document.createElement('tr');
       if (rowNumber === 1) {
-         tr.style.backgroundColor = '#f9fafb';
-         tr.style.fontWeight = 'bold';
+         tr.style.backgroundColor = '#f3f4f6';
+         tr.style.fontWeight = '700';
       }
       
       row.eachCell({ includeEmpty: true }, (cell) => {
         const td = document.createElement('td');
-        td.style.border = '1px solid #e5e7eb';
-        td.style.padding = '8px';
+        td.style.border = '1px solid #d1d5db';
+        td.style.padding = '6px';
         
         let cellValue = "";
         try {
-          const val = cell.value;
-          if (val !== null && val !== undefined) {
-            if (typeof val === 'object') {
-              cellValue = (val as any).result?.toString() ?? 
-                          (val as any).richText?.map((rt: any) => rt.text).join('') ?? 
-                          (val as any).text?.toString() ?? 
-                          String(val);
+          if (cell && cell.value !== undefined && cell.value !== null) {
+            const v = cell.value;
+            
+            // TOTAL DEFENSE EXTRACTION
+            if (typeof v === 'object') {
+                if ('result' in v && v.result !== null && v.result !== undefined) {
+                    cellValue = String(v.result);
+                } else if ('richText' in v && Array.isArray((v as any).richText)) {
+                    cellValue = (v as any).richText.map((rt: any) => rt?.text || "").join('');
+                } else if ('text' in v) {
+                    cellValue = String((v as any).text || "");
+                } else if ('error' in v) {
+                    cellValue = String((v as any).error || "#ERR");
+                } else if (v instanceof Date) {
+                    cellValue = v.toLocaleDateString();
+                } else {
+                    cellValue = String(v);
+                }
             } else {
-              cellValue = String(val);
+                cellValue = String(v);
             }
           }
         } catch (e) {
-          cellValue = "[Error]";
+          cellValue = "[Err]";
         }
         
-        td.innerText = cellValue;
+        td.innerText = cellValue || " "; // Ensure non-empty for layout
         tr.appendChild(td);
       });
       table.appendChild(tr);
     });
 
-    // STEALTH-RENDER CONTAINER (v2.1)
-    // Absolute positioning + zero opacity ensures zero-layout-skip capture
     const container = document.createElement('div');
-    container.id = "excel-to-pdf-stealth-zone";
+    container.id = "excel-to-pdf-shadow-render";
     container.style.width = '800px'; 
     container.style.padding = '40px';
     container.style.backgroundColor = 'white';
@@ -90,8 +101,8 @@ export default function ExcelToPdf() {
     container.appendChild(table);
     document.body.appendChild(container);
 
-    addLog("Capturing High-Fidelity PDF Layer...");
-    setProgress("Visual Synthesis", 70);
+    addLog("Synthesizing PDF Visualization...");
+    setProgress("Rasterizing Frames", 75);
 
     return new Promise<{ url: string; name: string }>((resolve, reject) => {
       doc.html(container, {
@@ -112,11 +123,13 @@ export default function ExcelToPdf() {
           try {
             const pdfBytes = doc.output('arraybuffer');
             const blob = new Blob([pdfBytes], { type: "application/pdf" });
-            document.body.removeChild(container);
-            addLog("Spreadsheet Visualization Complete.");
+            if (document.body.contains(container)) {
+                document.body.removeChild(container);
+            }
+            addLog("Spreadsheet Conversion Finalized.");
             resolve({
               url: URL.createObjectURL(blob),
-              name: `${file.name.split('.')[0]}.pdf`
+              name: `${file.name.replace(/\.[^/.]+$/, "")}.pdf`
             });
           } catch (err) {
             reject(err);
@@ -129,7 +142,7 @@ export default function ExcelToPdf() {
   return (
     <ConversionPage
       title="Excel to PDF"
-      subtitle="Stealth-Render v2.1 Engine. Professional Grade PDF extraction for spreadsheets and macro-enabled workbooks."
+      subtitle="Ultra-Stab v2.5 Engine. Advanced cell semantic recovery and high-fidelity spreadsheet visualization."
       targetFormat="PDF Document"
       accentColor="emerald"
       icon={DatabaseIcon}
