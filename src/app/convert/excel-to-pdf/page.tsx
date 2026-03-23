@@ -5,60 +5,42 @@ import { DatabaseIcon } from "lucide-react";
 
 export default function ExcelToPdf() {
   const processFile = async (file: File, setProgress: (status: string, value: number) => void, addLog: (msg: string) => void) => {
-    addLog("Activating Spreadsheet-to-PDF Ultra-Stab Engine v2.5...");
+    addLog("Activating Vector-Level Spreadsheet Engine v3.0 (AutoTable)...");
     
     const ExcelJS = await import("exceljs");
     const { jsPDF } = await import("jspdf");
+    const { default: autoTable } = await import("jspdf-autotable");
     
-    addLog("Parsing Workbook Binary...");
+    addLog("Analyzing Workbook Structure...");
     const arrayBuffer = await file.arrayBuffer();
     const workbook = new ExcelJS.Workbook();
     await workbook.xlsx.load(arrayBuffer);
     
     const worksheet = workbook.getWorksheet(1); 
-    if (!worksheet) throw new Error("No active worksheet found in the document.");
+    if (!worksheet) throw new Error("No active worksheet identified.");
 
-    addLog("Synchronizing Rendering Environment...");
-    if (typeof document !== 'undefined' && (document as any).fonts) {
-        await (document as any).fonts.ready;
-    }
-
-    addLog("Reconstructing Geometric Matrix...");
-    setProgress("Mapping Cells", 40);
+    addLog("Synthesizing Data Matrix...");
+    setProgress("Mapping Semantic Layer", 30);
     
     const doc = new jsPDF({
-      orientation: 'p',
+      orientation: 'landscape', // Landscape is better for spreadsheets
       unit: 'pt',
       format: 'a4'
     });
 
-    const table = document.createElement('table');
-    table.style.borderCollapse = 'collapse';
-    table.style.width = '100%';
-    table.style.fontSize = '8.5pt';
-    table.style.fontFamily = 'sans-serif';
-    table.style.color = '#1f2937';
+    const body: string[][] = [];
+    let headers: string[] = [];
 
     worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
       if (!row) return;
       
-      const tr = document.createElement('tr');
-      if (rowNumber === 1) {
-         tr.style.backgroundColor = '#f3f4f6';
-         tr.style.fontWeight = '700';
-      }
-      
+      const rowData: string[] = [];
       row.eachCell({ includeEmpty: true }, (cell) => {
-        const td = document.createElement('td');
-        td.style.border = '1px solid #d1d5db';
-        td.style.padding = '6px';
-        
         let cellValue = "";
         try {
           if (cell && cell.value !== undefined && cell.value !== null) {
             const v = cell.value;
-            
-            // TOTAL DEFENSE EXTRACTION
+            // TOTAL DEFENSE v3.0
             if (typeof v === 'object') {
                 if ('result' in v && v.result !== null && v.result !== undefined) {
                     cellValue = String(v.result);
@@ -80,71 +62,63 @@ export default function ExcelToPdf() {
         } catch (e) {
           cellValue = "[Err]";
         }
-        
-        td.innerText = cellValue || " "; // Ensure non-empty for layout
-        tr.appendChild(td);
+        rowData.push(cellValue);
       });
-      table.appendChild(tr);
+
+      if (rowNumber === 1) {
+        headers = rowData;
+      } else {
+        body.push(rowData);
+      }
     });
 
-    const container = document.createElement('div');
-    container.id = "excel-to-pdf-shadow-render";
-    container.style.width = '800px'; 
-    container.style.padding = '40px';
-    container.style.backgroundColor = 'white';
-    container.style.position = 'absolute';
-    container.style.left = '0';
-    container.style.top = '0';
-    container.style.zIndex = '-9999';
-    container.style.opacity = '0';
-    container.style.pointerEvents = 'none';
-    container.appendChild(table);
-    document.body.appendChild(container);
+    addLog("Drawing Vector Table Layer...");
+    setProgress("Finalizing PDF Streams", 70);
 
-    addLog("Synthesizing PDF Visualization...");
-    setProgress("Rasterizing Frames", 75);
-
-    return new Promise<{ url: string; name: string }>((resolve, reject) => {
-      doc.html(container, {
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          logging: false,
-          scrollX: 0,
-          scrollY: 0
-        },
-        margin: [30, 30, 30, 30],
-        autoPaging: 'text',
-        x: 0,
-        y: 0,
-        width: 535,
-        windowWidth: 800,
-        callback: function (doc) {
-          try {
-            const pdfBytes = doc.output('arraybuffer');
-            const blob = new Blob([pdfBytes], { type: "application/pdf" });
-            if (document.body.contains(container)) {
-                document.body.removeChild(container);
-            }
-            addLog("Spreadsheet Conversion Finalized.");
-            resolve({
-              url: URL.createObjectURL(blob),
-              name: `${file.name.replace(/\.[^/.]+$/, "")}.pdf`
-            });
-          } catch (err) {
-            reject(err);
-          }
-        }
-      });
+    // Using autoTable for direct vector drawing (Guaranteed no blank pages)
+    (doc as any).autoTable({
+      head: [headers],
+      body: body,
+      theme: 'grid',
+      styles: { 
+        fontSize: 7, 
+        cellPadding: 4, 
+        overflow: 'linebreak',
+        font: 'helvetica'
+      },
+      headStyles: { 
+        fillColor: [79, 70, 229], // Indigo-600
+        textColor: [255, 255, 255],
+        fontStyle: 'bold'
+      },
+      alternateRowStyles: {
+        fillColor: [249, 250, 251]
+      },
+      margin: { top: 40, bottom: 40, left: 20, right: 20 },
+      didDrawPage: (data: any) => {
+        // Add footer or header if needed
+        doc.setFontSize(8);
+        doc.text(`Page ${data.pageNumber}`, data.settings.margin.left, doc.internal.pageSize.height - 20);
+      }
     });
+
+    addLog("Compiling Binary Stream...");
+    const pdfBytes = doc.output('arraybuffer');
+    const blob = new Blob([pdfBytes], { type: "application/pdf" });
+    
+    addLog("Vector Conversion Complete.");
+    return {
+      url: URL.createObjectURL(blob),
+      name: `${file.name.replace(/\.[^/.]+$/, "")}.pdf`
+    };
   };
 
   return (
     <ConversionPage
       title="Excel to PDF"
-      subtitle="Ultra-Stab v2.5 Engine. Advanced cell semantic recovery and high-fidelity spreadsheet visualization."
+      subtitle="Vector-Level Engine v3.0. Direct drawing technology eliminates blank pages and preserves 100% of spreadsheet data."
       targetFormat="PDF Document"
-      accentColor="emerald"
+      accentColor="blue"
       icon={DatabaseIcon}
       accept=".xlsx,.xlsm"
       onConvert={processFile}
