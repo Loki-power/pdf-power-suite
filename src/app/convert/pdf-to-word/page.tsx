@@ -102,7 +102,10 @@ export default function PdfToWord() {
               new TextRun({ 
                 text: cleaned, 
                 size: 24, 
-                font: { name: selectedLang.includes('hin') ? "Noto Sans Devanagari" : "Arial", hint: "default" } 
+                font: { 
+                  name: selectedLang.includes('hin') ? "Nirmala UI, Mangal, Arial Unicode MS" : "Arial", 
+                  hint: "default" 
+                } 
               })
             ],
             spacing: { before: 120, line: 360 }
