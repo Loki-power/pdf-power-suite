@@ -53,7 +53,7 @@ export default function MergePDF() {
 
       for (const file of mergeFiles) {
         const buffer = await file.arrayBuffer();
-        const pdf = await PDFDocument.load(buffer);
+        const pdf = await PDFDocument.load(buffer, { ignoreEncryption: true });
         const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
         copiedPages.forEach((page) => mergedPdf.addPage(page));
       }

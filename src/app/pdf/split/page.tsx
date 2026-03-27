@@ -49,7 +49,7 @@ export default function SplitPDF() {
       setIsProcessing(true);
       
       const buffer = await splitFile.arrayBuffer();
-      const originalPdf = await PDFDocument.load(buffer);
+      const originalPdf = await PDFDocument.load(buffer, { ignoreEncryption: true });
       const totalPages = originalPdf.getPageCount();
       
       const newPdf = await PDFDocument.create();

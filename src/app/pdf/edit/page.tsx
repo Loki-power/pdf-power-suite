@@ -38,7 +38,7 @@ export default function EditPDF() {
     try {
       setIsProcessing(true);
       const arrayBuffer = await file.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
       const pages = pdfDoc.getPages();
       
       const targetPageIdx = pageNum - 1;

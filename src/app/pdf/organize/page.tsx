@@ -192,7 +192,7 @@ export default function OrganizePages() {
     try {
       setIsProcessing(true);
       
-      const originalPdf = await PDFDocument.load(fileBytes);
+      const originalPdf = await PDFDocument.load(fileBytes, { ignoreEncryption: true });
       const newPdf = await PDFDocument.create();
       
       const indicesToCopy = pages.map(p => p.originalIndex);

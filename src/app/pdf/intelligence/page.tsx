@@ -157,7 +157,7 @@ export default function Intelligence() {
     
     try {
       setIsProcessing(true);
-      const pdfDoc = await PDFDocument.load(fileBytes);
+      const pdfDoc = await PDFDocument.load(fileBytes, { ignoreEncryption: true });
       const pages = pdfDoc.getPages();
       
       // Simulate drawing redaction boxes for emails on Page 1 (if we had the exact coordinates)

@@ -121,7 +121,7 @@ export default function SignPDF() {
     
     try {
       setIsProcessing(true);
-      const pdfDoc = await PDFDocument.load(fileBytes);
+      const pdfDoc = await PDFDocument.load(fileBytes, { ignoreEncryption: true });
       const pages = pdfDoc.getPages();
       
       const signatureDataUrl = canvas.toDataURL("image/png");

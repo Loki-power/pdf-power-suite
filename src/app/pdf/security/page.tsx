@@ -142,7 +142,7 @@ export default function Security() {
       setIsProcessing(true);
       const arrayBuffer = await file.arrayBuffer();
       
-      const pdfDoc = await PDFDocument.load(arrayBuffer, { password: unlockPassword || undefined, ignoreEncryption: false } as any);
+      const pdfDoc = await PDFDocument.load(arrayBuffer, { password: unlockPassword || undefined, ignoreEncryption: true } as any);
       
       const pdfBytes = await pdfDoc.save();
       const blob = new Blob([pdfBytes as any], { type: "application/pdf" });

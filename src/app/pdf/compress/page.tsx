@@ -45,7 +45,7 @@ export default function CompressPDF() {
     
     try {
       setIsProcessing(true);
-      const pdfDoc = await PDFDocument.load(fileBytes);
+      const pdfDoc = await PDFDocument.load(fileBytes, { ignoreEncryption: true });
 
       if (compressionLevel === "extreme") {
         pdfDoc.setTitle('');

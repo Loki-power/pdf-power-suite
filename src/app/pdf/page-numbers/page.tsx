@@ -48,7 +48,7 @@ export default function PageNumbersPDF() {
     if (!fileBytes) return;
     try {
       setIsProcessing(true);
-      const pdfDoc = await PDFDocument.load(fileBytes);
+      const pdfDoc = await PDFDocument.load(fileBytes, { ignoreEncryption: true });
       const pages = pdfDoc.getPages();
       
       for (let i = 0; i < pages.length; i++) {

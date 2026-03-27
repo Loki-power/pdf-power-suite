@@ -96,7 +96,7 @@ export default function RotatePages() {
     try {
       setIsProcessing(true);
       
-      const pdf = await PDFDocument.load(fileBytes);
+      const pdf = await PDFDocument.load(fileBytes, { ignoreEncryption: true });
       const originalPages = pdf.getPages();
       const { degrees } = await import('pdf-lib');
       

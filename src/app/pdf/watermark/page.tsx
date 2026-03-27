@@ -47,7 +47,7 @@ export default function WatermarkPDF() {
     
     try {
       setIsProcessing(true);
-      const pdfDoc = await PDFDocument.load(fileBytes);
+      const pdfDoc = await PDFDocument.load(fileBytes, { ignoreEncryption: true });
       const pages = pdfDoc.getPages();
 
       for (const page of pages) {

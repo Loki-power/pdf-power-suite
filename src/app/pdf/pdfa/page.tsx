@@ -23,7 +23,7 @@ export default function PDFA() {
     try {
       setIsProcessing(true);
       const arrayBuffer = await file.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const pdfDoc = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
       
       // Setup minimal metadata required for archival hinting
       pdfDoc.setTitle(file.name.replace(".pdf", " - Archived"));

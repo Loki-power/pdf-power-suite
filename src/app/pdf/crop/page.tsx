@@ -61,7 +61,7 @@ export default function CropPDF() {
     if (!fileBytes || !completedCrop) return;
     try {
       setIsProcessing(true);
-      const pdfDoc = await PDFDocument.load(fileBytes);
+      const pdfDoc = await PDFDocument.load(fileBytes, { ignoreEncryption: true });
       const pages = pdfDoc.getPages();
       
       pages.forEach(page => {
