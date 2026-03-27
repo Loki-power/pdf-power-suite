@@ -89,7 +89,7 @@ export default function Home() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 opacity-90 hover:opacity-100 transition-opacity duration-500">
                  
                  {/* Format 1: PDF */}
-                 <Link href="/pdf/split-merge" className="group relative flex flex-col items-center p-8 sm:p-10 rounded-3xl bg-white border border-slate-200 hover:border-red-500/50 hover:bg-white transition-all duration-300 hover:shadow-[0_0_40px_-10px_rgba(239,68,68,0.2)] hover:-translate-y-2 overflow-hidden">
+                 <Link href="/pdf/merge" className="group relative flex flex-col items-center p-8 sm:p-10 rounded-3xl bg-white border border-slate-200 hover:border-red-500/50 hover:bg-white transition-all duration-300 hover:shadow-[0_0_40px_-10px_rgba(239,68,68,0.2)] hover:-translate-y-2 overflow-hidden">
                    <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-red-500/20 transition-colors duration-500" />
                    <div className="relative z-10 p-5 rounded-2xl bg-red-500/10 border border-red-500/20 group-hover:bg-red-500/20 transition-colors mb-6 shadow-inner">
                      <FileTextIcon className="w-12 h-12 sm:w-16 sm:h-16 text-red-500" />

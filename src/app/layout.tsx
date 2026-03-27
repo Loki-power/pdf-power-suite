@@ -16,6 +16,10 @@ export const metadata: Metadata = {
   description: 'A comprehensive suite of PDF tools entirely in your browser.',
 };
 
+import dynamic from 'next/dynamic';
+
+const HistorySidebar = dynamic(() => import('@/components/HistorySidebar').then(mod => mod.HistorySidebar), { ssr: false });
+
 export default function RootLayout({
   children,
 }: Readonly<{
