@@ -16,7 +16,6 @@ export const metadata: Metadata = {
   description: 'A comprehensive suite of PDF tools entirely in your browser.',
 };
 
-import { HistorySidebar } from '@/components/HistorySidebar';
 
 export default function RootLayout({
   children,
