@@ -24,6 +24,8 @@ export default function SplitPDF() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processedUrl, setProcessedUrl] = useState<string | null>(null);
   const [downloadName, setDownloadName] = useState("document.pdf");
+  const [password, setPassword] = useState("");
+  const [isEncrypted, setIsEncrypted] = useState(false);
   
   const splitInputRef = useRef<HTMLInputElement>(null);
 
@@ -36,6 +38,24 @@ export default function SplitPDF() {
       }
       setSplitFile(file);
       setProcessedUrl(null);
+      setPassword("");
+      setIsEncrypted(false);
+      
+      // Pre-check for encryption
+      checkEncryption(file);
+    }
+  };
+
+  const checkEncryption = async (file: File) => {
+    try {
+      const buffer = await file.arrayBuffer();
+      await PDFDocument.load(buffer);
+      setIsEncrypted(false);
+    } catch (err: any) {
+      if (err.message.includes("encrypted")) {
+        setIsEncrypted(true);
+        toast.info("This PDF is encrypted. Please provide a password.");
+      }
     }
   };
 
@@ -49,7 +69,20 @@ export default function SplitPDF() {
       setIsProcessing(true);
       
       const buffer = await splitFile.arrayBuffer();
-      const originalPdf = await PDFDocument.load(buffer, { ignoreEncryption: true });
+      const loadOptions: any = {};
+      if (password) loadOptions.password = password;
+      
+      let originalPdf;
+      try {
+        originalPdf = await PDFDocument.load(buffer, loadOptions);
+      } catch (err: any) {
+        if (err.message.includes("encrypted")) {
+          setIsEncrypted(true);
+          throw new Error("Password required for this encrypted PDF.");
+        }
+        throw err;
+      }
+
       const totalPages = originalPdf.getPageCount();
       
       const newPdf = await PDFDocument.create();
@@ -171,6 +204,21 @@ export default function SplitPDF() {
                   />
                   <p className="text-xs text-muted-foreground">Create a new PDF containing only these specific pages.</p>
                 </div>
+
+                {isEncrypted && (
+                  <div className="space-y-3 p-4 border border-blue-500/20 rounded-xl bg-blue-500/5">
+                    <Label htmlFor="password">PDF Password</Label>
+                    <Input 
+                      id="password" 
+                      type="password"
+                      placeholder="Enter password..." 
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="h-12"
+                    />
+                    <p className="text-xs text-blue-500">Required to decrypt and process the pages.</p>
+                  </div>
+                )}
 
                 {!processedUrl ? (
                   <Button size="lg" className="w-full bg-blue-600 hover:bg-blue-700 text-white" onClick={processSplit} disabled={isProcessing || !splitRanges}>

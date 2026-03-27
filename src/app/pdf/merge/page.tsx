@@ -4,6 +4,8 @@ import { useState, useRef } from "react";
 import { PDFDocument } from "pdf-lib";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useHistory } from "@/components/HistoryProvider";
 import { 
@@ -21,6 +23,8 @@ export default function MergePDF() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [processedUrl, setProcessedUrl] = useState<string | null>(null);
   const [downloadName, setDownloadName] = useState("document.pdf");
+  const [globalPassword, setGlobalPassword] = useState("");
+  const [hasEncryptedFile, setHasEncryptedFile] = useState(false);
   
   const mergeInputRef = useRef<HTMLInputElement>(null);
 
@@ -32,6 +36,21 @@ export default function MergePDF() {
       }
       setMergeFiles([...mergeFiles, ...newFiles]);
       setProcessedUrl(null);
+      
+      // Check for encryption in new files
+      newFiles.forEach(f => checkEncryption(f));
+    }
+  };
+
+  const checkEncryption = async (file: File) => {
+    try {
+      const buffer = await file.arrayBuffer();
+      await PDFDocument.load(buffer);
+    } catch (err: any) {
+      if (err.message.includes("encrypted")) {
+        setHasEncryptedFile(true);
+        toast.info(`'${file.name}' is encrypted. You may need a password to merge it.`);
+      }
     }
   };
 
@@ -53,7 +72,20 @@ export default function MergePDF() {
 
       for (const file of mergeFiles) {
         const buffer = await file.arrayBuffer();
-        const pdf = await PDFDocument.load(buffer, { ignoreEncryption: true });
+        const loadOptions: any = {};
+        if (globalPassword) loadOptions.password = globalPassword;
+        
+        let pdf;
+        try {
+          pdf = await PDFDocument.load(buffer, loadOptions);
+        } catch (err: any) {
+          if (err.message.includes("encrypted")) {
+            setHasEncryptedFile(true);
+            throw new Error(`Password required for '${file.name}'.`);
+          }
+          throw err;
+        }
+
         const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
         copiedPages.forEach((page) => mergedPdf.addPage(page));
       }
@@ -130,6 +162,21 @@ export default function MergePDF() {
                     </div>
                   ))}
                 </div>
+
+                {hasEncryptedFile && (
+                  <div className="space-y-3 p-4 border border-orange-500/20 rounded-xl bg-orange-500/5">
+                    <Label htmlFor="password">PDF Password (Global)</Label>
+                    <Input 
+                      id="password" 
+                      type="password"
+                      placeholder="Enter password for encrypted files..." 
+                      value={globalPassword}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGlobalPassword(e.target.value)}
+                      className="h-12"
+                    />
+                    <p className="text-xs text-orange-500">This password will be applied to all encrypted files in the list.</p>
+                  </div>
+                )}
                 
                 {!processedUrl ? (
                   <Button size="lg" className="w-full bg-orange-600 hover:bg-orange-700 text-white" onClick={processMerge} disabled={isProcessing || mergeFiles.length < 2}>
