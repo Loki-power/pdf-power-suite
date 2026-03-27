@@ -8,6 +8,11 @@ import { useEffect, useState } from "react";
 
 export function HistorySidebar() {
   const { history, isSidebarOpen, toggleSidebar, clearHistory } = useHistory();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
 
   const getIconForModule = (module: string) => {
     switch (module) {
